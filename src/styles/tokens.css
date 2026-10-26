@@ -1,0 +1,135 @@
+/*
+ * Ontwerptokens — Goed Geregeld Autoverhuur
+ * Toelichting per keuze: docs/visuele-richting.md
+ */
+
+:root {
+  /* ── Kleur: vlakken ── */
+  --c-night: #0b0b0c;
+  --c-ink: #111214;
+  --c-graphite: #17181b;
+  --c-carbon: #1e1f23;
+  --c-carbon-hi: #24262b;
+  --c-steel: #2a2c31;
+
+  /* ── Kleur: tekst ── */
+  --c-bone: #eeeae2;
+  --c-bone-2: #c9c4ba;
+  --c-bone-3: #9c978d;
+
+  /* ── Kleur: lijnen ── */
+  --c-line: rgb(238 234 226 / 0.14);
+  --c-line-soft: rgb(238 234 226 / 0.08);
+  --c-line-strong: rgb(238 234 226 / 0.3);
+
+  /* ── Kleur: accent (afgeleid van het logo) ── */
+  --c-champagne: #c8b37e;
+  --c-champagne-hi: #dccb9a;
+  --c-champagne-deep: #6e5d33;
+  --c-champagne-wash: rgb(200 179 126 / 0.12);
+  --c-on-accent: #121212;
+
+  /* ── Lichte sectie ── */
+  --c-paper: #eeeae2;
+  --c-paper-ink: #141414;
+  --c-paper-ink-2: #4a4740;
+  --c-paper-line: rgb(20 20 20 / 0.14);
+
+  /* ── Status (alleen beheer; altijd met tekst/icoon) ── */
+  --c-ok: #86b592;
+  --c-warn: #ddae62;
+  --c-danger: #e58377;
+  --c-info: #93afcf;
+
+  /* ── Typografie ── */
+  --font-sans: var(--font-archivo), 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-mono: var(--font-plex-mono), 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --fs-display: clamp(2.75rem, 1.55rem + 5.1vw, 7.5rem);
+  --fs-h1: clamp(2.25rem, 1.45rem + 3.4vw, 5rem);
+  --fs-h2: clamp(1.875rem, 1.25rem + 2.6vw, 3.75rem);
+  --fs-h3: clamp(1.375rem, 1.12rem + 1.05vw, 2rem);
+  --fs-h4: clamp(1.125rem, 1.05rem + 0.3vw, 1.3125rem);
+  --fs-lead: clamp(1.125rem, 1.02rem + 0.45vw, 1.375rem);
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9375rem;
+  --fs-label: clamp(0.75rem, 0.73rem + 0.08vw, 0.8125rem);
+
+  --lh-display: 0.94;
+  --lh-heading: 1.04;
+  --lh-tight: 1.12;
+  --lh-lead: 1.45;
+  --lh-body: 1.6;
+
+  --tracking-display: -0.025em;
+  --tracking-heading: -0.018em;
+  --tracking-label: 0.14em;
+
+  --wdth-expanded: 125%;
+  --wdth-semi: 112%;
+
+  /* ── Maatvoering ── */
+  --w-max: 90rem; /* 1440px */
+  --w-text: 40rem;
+  --w-narrow: 52rem;
+  --gutter: clamp(1rem, 0.55rem + 2.2vw, 2.5rem);
+  --header-h: 4.5rem;
+
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4rem;
+  --s-9: 6rem;
+  --s-10: 8rem;
+  --s-11: 10rem;
+
+  --section-y: clamp(5rem, 3.2rem + 7vw, 10rem);
+  --section-y-tight: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+
+  /* ── Vorm ── */
+  --r-0: 0;
+  --r-xs: 2px;
+  --r-pill: 999px;
+  --hairline: 1px;
+
+  /* ── Aanraakdoelen ── */
+  --tap: 3rem; /* 48px */
+
+  /* ── Motion ── */
+  --d-fast: 160ms;
+  --d-base: 280ms;
+  --d-slow: 600ms;
+  --d-reveal: 900ms;
+  --d-intro: 1200ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Lagen ── */
+  --z-base: 1;
+  --z-sticky: 20;
+  --z-header: 40;
+  --z-overlay: 60;
+  --z-toast: 80;
+
+  /* ── Focus ── */
+  --focus-color: var(--c-champagne);
+  --focus-ring: 2px solid var(--focus-color);
+  --focus-offset: 3px;
+
+  /* ── Safe areas ── */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+
+  color-scheme: dark;
+}
+
+@media (min-width: 1080px) {
+  :root {
+    --header-h: 5.25rem;
+  }
+}

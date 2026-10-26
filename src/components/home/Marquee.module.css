@@ -1,0 +1,103 @@
+.marquee {
+  position: relative;
+  border-block: 1px solid var(--c-line-soft);
+  background: var(--c-ink);
+  overflow: hidden;
+}
+
+.viewport {
+  overflow: hidden;
+  padding-block: clamp(1.25rem, 0.8rem + 1.6vw, 2.25rem);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.set {
+  display: flex;
+  flex: none;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(1.25rem, 0.8rem + 1.8vw, 2.75rem);
+  padding-right: clamp(1.25rem, 0.8rem + 1.8vw, 2.75rem);
+  white-space: nowrap;
+}
+
+.text {
+  font-size: clamp(2rem, 1.1rem + 4.2vw, 5.25rem);
+  font-weight: 600;
+  font-stretch: var(--wdth-expanded);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--c-bone);
+}
+
+.item:nth-child(even) .text {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(238 234 226 / 0.55);
+}
+
+.hex {
+  flex: none;
+  width: clamp(1rem, 0.7rem + 1vw, 1.75rem);
+  height: auto;
+  color: var(--c-champagne);
+}
+
+.toggle {
+  position: absolute;
+  right: var(--s-2);
+  bottom: var(--s-2);
+  display: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  background: rgb(17 18 20 / 0.86);
+  color: var(--c-bone-2);
+  transition: color var(--d-fast), border-color var(--d-fast);
+}
+
+.toggle:hover {
+  color: var(--c-bone);
+  border-color: var(--c-line-strong);
+}
+
+/* De knop bestaat alleen als er daadwerkelijk iets beweegt. */
+.marquee[data-animated='true'] .toggle {
+  display: grid;
+}
+
+/* Zonder animatie (geen JS of reduced motion): rustige, statische regel. */
+.marquee:not([data-animated='true']) .viewport {
+  mask-image: none;
+}
+
+.marquee:not([data-animated='true']) .track {
+  width: auto;
+  justify-content: center;
+}
+
+.marquee:not([data-animated='true']) .set + .set {
+  display: none;
+}
+
+.marquee:not([data-animated='true']) .set {
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-inline: var(--gutter);
+  row-gap: var(--s-3);
+}
+
+.marquee:not([data-animated='true']) .text {
+  font-size: clamp(1.25rem, 0.9rem + 1.6vw, 2.25rem);
+}

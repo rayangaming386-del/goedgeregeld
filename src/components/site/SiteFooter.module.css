@@ -1,0 +1,128 @@
+.footer {
+  position: relative;
+  background: var(--c-night);
+  border-top: 1px solid var(--c-line-soft);
+  padding-top: var(--section-y-tight);
+  padding-bottom: calc(var(--s-6) + var(--safe-bottom) + var(--footer-extra, 0px));
+}
+
+.inner {
+  display: grid;
+  gap: var(--s-7) var(--s-6);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.inner > .brand {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 720px) {
+  .inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  .inner {
+    grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
+  }
+
+  .inner > .brand {
+    grid-column: auto;
+  }
+}
+
+.brand {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+}
+
+.logoLink {
+  display: inline-block;
+  width: fit-content;
+}
+
+.logo {
+  width: 13.5rem;
+  height: auto;
+}
+
+.tagline {
+  max-width: 26ch;
+  color: var(--c-bone-2);
+  font-size: var(--fs-small);
+}
+
+.col {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+}
+
+.col ul {
+  display: grid;
+  gap: var(--s-1);
+  list-style: none;
+}
+
+.col a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  color: var(--c-bone-2);
+  text-decoration: none;
+  transition: color var(--d-fast) var(--ease-smooth);
+}
+
+.col a:hover {
+  color: var(--c-bone);
+}
+
+.city {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  color: var(--c-bone-2);
+}
+
+.bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3) var(--s-6);
+  margin-top: var(--s-8);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--c-line-soft);
+  font-size: 0.875rem;
+  color: var(--c-bone-3);
+}
+
+.legal {
+  display: flex;
+  gap: var(--s-5);
+  list-style: none;
+}
+
+.legal a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--c-bone-2);
+}
+
+.note {
+  flex-basis: 100%;
+  max-width: 70ch;
+}
+
+.concept {
+  flex-basis: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-champagne);
+}

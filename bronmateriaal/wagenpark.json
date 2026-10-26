@@ -1,0 +1,62 @@
+[
+  {
+    "id": "rs3",
+    "naam": "Audi RS3 Sportback",
+    "dagprijs_eur": 400,
+    "borg_eur": 2000,
+    "minimumleeftijd": 21,
+    "kilometers": "Kilometervrij",
+    "kentekenland": "Duits",
+    "transmissie": "Automaat",
+    "vermogen_pk": 400,
+    "koppel_nm": 500,
+    "nul_tot_honderd_seconden": 3.8,
+    "bron": "https://www.centralrental.nl/alle-autos/audi-rs3-sportback/734",
+    "status": "Overgenomen uit tussenpersoonlisting; eigenaar moet actualiteit bevestigen"
+  },
+  {
+    "id": "rsq3",
+    "naam": "Audi RSQ3 10 years Edition",
+    "dagprijs_eur": 450,
+    "borg_eur": 2000,
+    "minimumleeftijd": 21,
+    "kilometers": "Kilometervrij",
+    "kentekenland": "Duits",
+    "transmissie": "Automaat",
+    "vermogen_pk": 400,
+    "koppel_nm": 480,
+    "nul_tot_honderd_seconden": 4.5,
+    "bron": "https://www.centralrental.nl/alle-autos/audi-rsq3-10-years-edition",
+    "status": "Overgenomen uit tussenpersoonlisting; eigenaar moet actualiteit bevestigen"
+  },
+  {
+    "id": "sq5",
+    "naam": "Audi SQ5 (2026)",
+    "dagprijs_eur": 400,
+    "borg_eur": 2000,
+    "minimumleeftijd": 21,
+    "kilometers": "Kilometervrij",
+    "kentekenland": "Duits",
+    "transmissie": "Automaat",
+    "vermogen_pk": 362,
+    "koppel_nm": 550,
+    "nul_tot_honderd_seconden": 4.5,
+    "bron": "https://www.centralrental.nl/alle-autos/audi-sq5-2026/738",
+    "status": "Overgenomen uit tussenpersoonlisting; eigenaar moet actualiteit bevestigen"
+  },
+  {
+    "id": "sq8",
+    "naam": "Audi SQ8 (700PK) + Downpipe",
+    "dagprijs_eur": 600,
+    "borg_eur": 2500,
+    "minimumleeftijd": 21,
+    "kilometers": "Kilometervrij",
+    "kentekenland": "Duits",
+    "transmissie": "Automaat",
+    "vermogen_pk": 700,
+    "koppel_nm": 900,
+    "nul_tot_honderd_seconden": 3.6,
+    "bron": "https://www.centralrental.nl/alle-autos/audi-sq8-700pk-downpipe",
+    "status": "Overgenomen uit tussenpersoonlisting; eigenaar moet actualiteit bevestigen"
+  }
+]

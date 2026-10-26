@@ -1,0 +1,25 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# omgeving (bevat geheimen)
+.env
+.env.local
+.env.*.local
+
+# lokale media-opslag (wordt door de seed en uploads gevuld)
+storage/
+
+# tests
+coverage/
+test-results/
+playwright-report/
+tests/e2e/.artifacts/
+
+# os
+.DS_Store

@@ -1,0 +1,648 @@
+/* ───────────── Reset ───────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-synthesis-weight: none;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+  hanging-punctuation: first last;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--c-ink);
+  color: var(--c-bone);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  font-stretch: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+/* Achtergrond niet scrollbaar zolang een modale laag open is. */
+html:has(dialog[open][data-scroll-lock]) {
+  overflow: hidden;
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+dl,
+dd {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+::selection {
+  background: var(--c-champagne);
+  color: var(--c-on-accent);
+}
+
+/* ───────────── Focus ───────────── */
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ───────────── Toegankelijkheid ───────────── */
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: calc(var(--z-overlay) + 10);
+  padding: 0.875rem 1.25rem;
+  background: var(--c-champagne);
+  color: var(--c-on-accent);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--r-xs);
+  transform: translateY(-160%);
+  transition: transform var(--d-base) var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline-color: var(--c-bone);
+}
+
+/* ───────────── Layout ───────────── */
+
+.container {
+  width: 100%;
+  max-width: calc(var(--w-max) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-y);
+}
+
+.section--tight {
+  padding-block: var(--section-y-tight);
+}
+
+.surface-night {
+  background: var(--c-night);
+}
+
+.surface-ink {
+  background: var(--c-ink);
+}
+
+.surface-graphite {
+  background: var(--c-graphite);
+}
+
+.surface-paper {
+  --focus-color: var(--c-champagne-deep);
+  background: var(--c-paper);
+  color: var(--c-paper-ink);
+  color-scheme: light;
+}
+
+/* ───────────── Typografie ───────────── */
+
+.t-display,
+.t-h1,
+.t-h2,
+.t-h3 {
+  font-family: var(--font-sans);
+  font-stretch: var(--wdth-expanded);
+  font-weight: 640;
+  letter-spacing: var(--tracking-heading);
+}
+
+.t-display {
+  font-size: var(--fs-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: 660;
+}
+
+.t-h1 {
+  font-size: var(--fs-h1);
+  line-height: 1;
+}
+
+.t-h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-heading);
+}
+
+.t-h3 {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-tight);
+  font-weight: 620;
+  letter-spacing: -0.012em;
+}
+
+.t-h4 {
+  font-size: var(--fs-h4);
+  line-height: 1.25;
+  font-weight: 600;
+  font-stretch: var(--wdth-semi);
+}
+
+.t-lead {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  color: var(--c-bone-2);
+  max-width: 36ch;
+}
+
+.surface-paper .t-lead {
+  color: var(--c-paper-ink-2);
+}
+
+.t-body {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--c-bone-2);
+  max-width: 62ch;
+}
+
+.t-small {
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.t-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--c-bone-3);
+}
+
+.surface-paper .t-label {
+  color: var(--c-paper-ink-2);
+}
+
+.t-mono {
+  font-family: var(--font-mono);
+  font-feature-settings: 'zero' 0;
+}
+
+.t-accent {
+  color: var(--c-champagne);
+}
+
+.surface-paper .t-accent {
+  color: var(--c-champagne-deep);
+}
+
+.nums {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Sectiekop: label + titel */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.eyebrow::before {
+  content: '';
+  width: 1.75rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+/* ───────────── Knoppen ───────────── */
+
+.btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--c-bone);
+  --btn-border: var(--c-line-strong);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: var(--tap);
+  padding: 0.75rem 1.375rem;
+  border: 1px solid var(--btn-border);
+  border-radius: var(--r-xs);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-sans);
+  font-size: 0.9688rem;
+  font-weight: 600;
+  font-stretch: var(--wdth-semi);
+  line-height: 1.15;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--d-fast) var(--ease-smooth),
+    border-color var(--d-fast) var(--ease-smooth),
+    color var(--d-fast) var(--ease-smooth),
+    transform var(--d-fast) var(--ease-smooth);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn[disabled],
+.btn[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  --btn-bg: var(--c-champagne);
+  --btn-fg: var(--c-on-accent);
+  --btn-border: var(--c-champagne);
+}
+
+.btn--primary:hover:not([disabled]) {
+  --btn-bg: var(--c-champagne-hi);
+  --btn-border: var(--c-champagne-hi);
+}
+
+.btn--secondary:hover:not([disabled]) {
+  --btn-border: var(--c-bone);
+  --btn-bg: rgb(238 234 226 / 0.05);
+}
+
+.btn--ghost {
+  --btn-border: transparent;
+  padding-inline: 0.75rem;
+}
+
+.btn--ghost:hover:not([disabled]) {
+  --btn-bg: rgb(238 234 226 / 0.06);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--sm {
+  min-height: 2.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.surface-paper .btn--secondary {
+  --btn-fg: var(--c-paper-ink);
+  --btn-border: rgb(20 20 20 / 0.35);
+}
+
+.surface-paper .btn--secondary:hover {
+  --btn-border: var(--c-paper-ink);
+  --btn-bg: rgb(20 20 20 / 0.04);
+}
+
+.btn__icon {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  transition: transform var(--d-base) var(--ease-out);
+}
+
+.btn:hover .btn__icon--move,
+.link-arrow:hover .btn__icon--move {
+  transform: translateX(4px);
+}
+
+/* Tekstlink met pijl */
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  font-weight: 600;
+  font-stretch: var(--wdth-semi);
+  text-decoration: none;
+  color: var(--c-bone);
+}
+
+.link-arrow > span {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size var(--d-base) var(--ease-out);
+  padding-bottom: 2px;
+}
+
+.link-arrow:hover > span {
+  background-size: 100% 1px;
+}
+
+/* ───────────── Labels en chips ───────────── */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 1.75rem;
+  padding: 0.2rem 0.7rem;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-bone-2);
+  white-space: nowrap;
+}
+
+.chip--accent {
+  border-color: rgb(200 179 126 / 0.45);
+  color: var(--c-champagne);
+}
+
+/* Markering voor onbevestigde gegevens in conceptmodus */
+.concept-mark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  max-width: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+  color: var(--c-champagne);
+}
+
+.concept-mark::before {
+  content: '';
+  flex: none;
+  width: 0.4rem;
+  height: 0.4rem;
+  border: 1px solid currentColor;
+  transform: rotate(45deg) translateY(-0.1rem);
+}
+
+.surface-paper .concept-mark {
+  color: var(--c-champagne-deep);
+}
+
+/* ───────────── Formulieren ───────────── */
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.field__label {
+  font-size: var(--fs-small);
+  font-weight: 560;
+  line-height: 1.35;
+  color: var(--c-bone);
+}
+
+.field__optional {
+  font-weight: 400;
+  color: var(--c-bone-3);
+}
+
+.field__hint {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--c-bone-3);
+}
+
+.field__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--c-danger);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.75rem 1rem;
+  background: var(--c-carbon);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-xs);
+  color: var(--c-bone);
+  /* 16px+ voorkomt automatisch inzoomen op iOS */
+  font-size: 1rem;
+  line-height: 1.4;
+  transition:
+    border-color var(--d-fast) var(--ease-smooth),
+    background-color var(--d-fast) var(--ease-smooth);
+  appearance: none;
+}
+
+.textarea {
+  min-height: 7.5rem;
+  resize: vertical;
+}
+
+.select {
+  padding-right: 2.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23c9c4ba' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--c-bone-3);
+  opacity: 1;
+}
+
+.input:hover,
+.select:hover,
+.textarea:hover {
+  border-color: var(--c-line-strong);
+}
+
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 1px;
+  border-color: var(--c-champagne);
+}
+
+.input[aria-invalid='true'],
+.select[aria-invalid='true'],
+.textarea[aria-invalid='true'] {
+  border-color: var(--c-danger);
+}
+
+.input::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+  cursor: pointer;
+}
+
+/* ───────────── Overig ───────────── */
+
+.hairline {
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: var(--c-line);
+}
+
+.frame-corners {
+  position: relative;
+}
+
+.frame-corners::before,
+.frame-corners::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  border-color: var(--c-champagne);
+  border-style: solid;
+  opacity: 0.9;
+}
+
+.frame-corners::before {
+  top: -7px;
+  left: -7px;
+  border-width: 1px 0 0 1px;
+}
+
+.frame-corners::after {
+  right: -7px;
+  bottom: -7px;
+  border-width: 0 1px 1px 0;
+}
+
+/*
+ * Reveal-beginstaten worden niet in CSS gezet: GSAP zet ze pas wanneer de
+ * animatie daadwerkelijk start. Faalt JavaScript, dan blijft alles zichtbaar.
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .btn {
+    border: 1px solid ButtonText;
+  }
+}
+
+/* SplitText-maskers: ruimte voor stokken en staarten (g, j, p) zonder layoutverschil. */
+.split-line-mask {
+  padding-block: 0.06em 0.14em;
+  margin-block: -0.06em -0.14em;
+}

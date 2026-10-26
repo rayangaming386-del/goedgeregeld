@@ -1,0 +1,33 @@
+.specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+}
+
+.item dd {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+}
+
+.value {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--c-bone);
+}
+
+.unit,
+.hint {
+  font-size: 0.75rem;
+  color: var(--c-bone-3);
+  letter-spacing: 0.04em;
+}
+
+.hint {
+  margin-left: 0.15rem;
+}
+
+.compact .value {
+  font-size: 0.875rem;
+}

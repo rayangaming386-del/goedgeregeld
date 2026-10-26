@@ -1,0 +1,57 @@
+{
+  "name": "goed-geregeld-autoverhuur",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Website en beheeromgeving voor Goed Geregeld Autoverhuur (Den Haag)",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "node --test tests/e2e/",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:setup": "pnpm db:migrate && pnpm db:seed",
+    "user:create": "tsx scripts/create-user.ts"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "2.2.2",
+    "aws4fetch": "1.0.20",
+    "drizzle-orm": "0.45.4",
+    "gsap": "3.15.0",
+    "next": "16.4.3",
+    "pg": "8.23.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "server-only": "0.0.1",
+    "sharp": "0.35.5",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@fontsource-variable/archivo": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@playwright/test": "1.63.0",
+    "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "drizzle-kit": "0.31.11",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.0.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "@node-rs/argon2"
+    ]
+  }
+}

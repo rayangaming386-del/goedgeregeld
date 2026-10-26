@@ -1,0 +1,113 @@
+.grid {
+  display: grid;
+  gap: var(--s-7);
+}
+
+.head {
+  display: grid;
+  gap: var(--s-5);
+  align-content: start;
+}
+
+.head h2 {
+  max-width: 12ch;
+}
+
+.outro {
+  display: grid;
+  gap: var(--s-4);
+  justify-items: start;
+  color: var(--c-bone-2);
+}
+
+.list {
+  border-top: 1px solid var(--c-line);
+  interpolate-size: allow-keywords;
+}
+
+.item {
+  border-bottom: 1px solid var(--c-line);
+}
+
+.question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-5);
+  min-height: 4.5rem;
+  padding-block: var(--s-4);
+  cursor: pointer;
+  list-style: none;
+  font-size: clamp(1.0625rem, 0.98rem + 0.4vw, 1.3125rem);
+  font-weight: 560;
+  font-stretch: var(--wdth-semi);
+  line-height: 1.35;
+  color: var(--c-bone);
+  transition: color var(--d-fast) var(--ease-smooth);
+}
+
+.question::-webkit-details-marker {
+  display: none;
+}
+
+.question:hover {
+  color: var(--c-champagne-hi);
+}
+
+.question:focus-visible {
+  outline-offset: 2px;
+}
+
+.icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  color: var(--c-bone-2);
+  transition:
+    transform var(--d-base) var(--ease-out),
+    border-color var(--d-base) var(--ease-smooth),
+    color var(--d-base) var(--ease-smooth);
+}
+
+.item[open] .icon {
+  transform: rotate(45deg);
+  border-color: var(--c-champagne);
+  color: var(--c-champagne);
+}
+
+.answer {
+  display: grid;
+  gap: var(--s-3);
+  max-width: 62ch;
+  padding-bottom: var(--s-6);
+  color: var(--c-bone-2);
+}
+
+/* Vloeiend openen waar de browser dat ondersteunt. */
+.item::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size var(--d-base) var(--ease-out),
+    content-visibility var(--d-base) allow-discrete;
+}
+
+.item[open]::details-content {
+  block-size: auto;
+}
+
+@media (min-width: 1080px) {
+  .grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--s-9);
+  }
+
+  .head {
+    position: sticky;
+    top: calc(var(--header-h) + var(--s-7));
+  }
+}

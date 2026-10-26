@@ -1,0 +1,168 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--c-graphite);
+  border: 1px solid var(--c-line-soft);
+  transition:
+    border-color var(--d-base) var(--ease-smooth),
+    background-color var(--d-base) var(--ease-smooth);
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--c-champagne);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--d-slow) var(--ease-out);
+  pointer-events: none;
+}
+
+.card:hover,
+.card:focus-within {
+  border-color: var(--c-line-strong);
+  background: var(--c-carbon);
+}
+
+.card:hover::after,
+.card:focus-within::after {
+  transform: scaleX(1);
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+@media (min-width: 720px) {
+  .media {
+    aspect-ratio: 4 / 5;
+  }
+}
+
+.picture {
+  position: absolute;
+  inset: 0;
+}
+
+.img {
+  transition: transform 0.9s var(--ease-out);
+}
+
+.card:hover .img {
+  transform: scale(1.045);
+}
+
+.empty {
+  position: absolute;
+  inset: 0;
+  background: var(--c-carbon);
+}
+
+.code {
+  position: absolute;
+  left: var(--s-4);
+  bottom: var(--s-3);
+  font-size: clamp(2.5rem, 1.6rem + 3vw, 3.75rem);
+  font-weight: 700;
+  font-stretch: var(--wdth-expanded);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: rgb(238 234 226 / 0.94);
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.35);
+  pointer-events: none;
+}
+
+.badge {
+  position: absolute;
+  top: var(--s-3);
+  right: var(--s-3);
+  background: rgb(11 11 12 / 0.78);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-5);
+}
+
+.meta {
+  display: flex;
+  gap: 0.5rem;
+  color: var(--c-bone-3);
+}
+
+.title {
+  font-size: clamp(1.3rem, 1.15rem + 0.5vw, 1.625rem);
+}
+
+.link {
+  text-decoration: none;
+}
+
+/* Gestrekte link: de hele kaart is klikbaar. */
+.link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.link:focus-visible {
+  outline: none;
+}
+
+.card:has(.link:focus-visible) {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.tagline {
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--c-bone-2);
+}
+
+.footer {
+  display: grid;
+  gap: var(--s-4);
+  margin-top: auto;
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--c-line-soft);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.more {
+  min-height: auto;
+  font-size: 0.9375rem;
+}
+
+.card:hover .more :global(.btn__icon--move) {
+  transform: translateX(4px);
+}
+
+.card:hover .more > span {
+  background-size: 100% 1px;
+}
+
+/* Boven de gestrekte link, zodat deze knop zelfstandig werkt. */
+.request {
+  position: relative;
+  z-index: 2;
+}
