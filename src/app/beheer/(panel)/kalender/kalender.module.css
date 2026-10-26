@@ -1,0 +1,372 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-4);
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.rangeTitle {
+  margin-left: var(--s-2);
+  font-size: 1.125rem;
+  font-weight: 620;
+  text-transform: capitalize;
+}
+
+.filter {
+  display: flex;
+  gap: var(--s-2);
+}
+
+.filter .select,
+.filter :global(.select) {
+  min-height: 2.5rem;
+  padding-block: 0.4rem;
+}
+
+.legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-bottom: var(--s-4);
+}
+
+.legend li {
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--r-xs);
+}
+
+/* ───────────── Items per soort: kleur + rand/patroon + icoon + tekst ───────────── */
+
+.item {
+  --k: var(--c-bone-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: var(--c-bone);
+  border-left: 3px solid var(--k);
+  background: color-mix(in srgb, var(--k) 14%, transparent);
+}
+
+.item a,
+.item > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.item svg {
+  flex: none;
+  color: var(--k);
+}
+
+/* Aanvraag: gestippelde rand (nog niets vastgelegd) */
+.k_aanvraag {
+  --k: var(--c-info);
+  border-left-style: dashed;
+  background: transparent;
+  outline: 1px dashed color-mix(in srgb, var(--k) 55%, transparent);
+  outline-offset: -1px;
+}
+
+/* Optie: gearceerd */
+.k_optie {
+  --k: var(--c-warn);
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--k) 18%, transparent) 0 6px, transparent 6px 12px);
+}
+
+.k_bevestigd {
+  --k: var(--c-ok);
+  background: color-mix(in srgb, var(--k) 22%, transparent);
+}
+
+.k_afgerond {
+  --k: var(--c-bone-3);
+  color: var(--c-bone-2);
+}
+
+/* Onderhoud: kruisarcering */
+.k_onderhoud {
+  --k: var(--c-danger);
+  background:
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--k) 16%, transparent) 0 5px, transparent 5px 10px),
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--k) 16%, transparent) 0 5px, transparent 5px 10px);
+}
+
+.k_blokkade {
+  --k: var(--c-bone-2);
+  background: color-mix(in srgb, var(--k) 12%, var(--c-carbon));
+}
+
+.hasConflict {
+  box-shadow: inset 0 0 0 1px var(--c-danger);
+}
+
+.conflict {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-left: auto;
+  padding: 0 0.3rem;
+  border-radius: var(--r-xs);
+  background: var(--c-danger);
+  color: var(--c-on-accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.conflict svg {
+  color: var(--c-on-accent);
+}
+
+.itemKind {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.itemTitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--c-bone-2);
+}
+
+.itemCar {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.itemTime {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--c-bone-3);
+}
+
+/* ───────────── Desktop ───────────── */
+
+.desktop {
+  display: none;
+}
+
+.agenda {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.agendaDay h3 {
+  margin-bottom: var(--s-2);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.agendaDay ul {
+  list-style: none;
+  display: grid;
+  gap: var(--s-1);
+}
+
+.agendaDay li {
+  display: flex;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8125rem;
+}
+
+@media (min-width: 900px) {
+  .desktop {
+    display: block;
+  }
+
+  .agenda {
+    display: none;
+  }
+}
+
+.month {
+  display: grid;
+  border: 1px solid var(--c-line-soft);
+  border-radius: var(--r-xs);
+  overflow: hidden;
+  background: var(--c-graphite);
+}
+
+.monthHead,
+.monthRow {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.monthHead div {
+  padding: 0.5rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-bone-3);
+  background: var(--c-carbon);
+  border-bottom: 1px solid var(--c-line-soft);
+}
+
+.day {
+  min-height: 7.5rem;
+  padding: 0.35rem;
+  border-right: 1px solid var(--c-line-soft);
+  border-bottom: 1px solid var(--c-line-soft);
+  min-width: 0;
+}
+
+.day:nth-child(7n) {
+  border-right: 0;
+}
+
+.outside {
+  background: rgb(0 0 0 / 0.18);
+}
+
+.outside .dayNum {
+  color: var(--c-bone-3);
+}
+
+.dayNum {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  margin-bottom: 0.25rem;
+  border-radius: var(--r-pill);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  color: var(--c-bone);
+}
+
+.today .dayNum,
+.weekDays .today,
+h3.today {
+  color: var(--c-champagne);
+  font-weight: 650;
+}
+
+.today .dayNum {
+  box-shadow: inset 0 0 0 1px var(--c-champagne);
+}
+
+.dayItems {
+  list-style: none;
+  display: grid;
+  gap: 3px;
+}
+
+.dayItems .item {
+  display: flex;
+  max-width: 100%;
+  padding: 0.15rem 0.35rem;
+  overflow: hidden;
+}
+
+.dayItems .item a,
+.dayItems .item > span {
+  overflow: hidden;
+}
+
+.dayItems .itemKind {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dayItems .conflict {
+  padding: 0 0.2rem;
+}
+
+.dayItems .itemTitle {
+  display: none;
+}
+
+/* Weektijdlijn */
+.week {
+  border: 1px solid var(--c-line-soft);
+  border-radius: var(--r-xs);
+  background: var(--c-graphite);
+  overflow: hidden;
+}
+
+.weekHead,
+.weekRow {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+}
+
+.weekHead {
+  background: var(--c-carbon);
+  border-bottom: 1px solid var(--c-line-soft);
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.weekDays div {
+  padding: 0.5rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-bone-3);
+}
+
+.weekRow + .weekRow {
+  border-top: 1px solid var(--c-line-soft);
+}
+
+.weekCar {
+  padding: 0.75rem;
+  font-weight: 560;
+  border-right: 1px solid var(--c-line-soft);
+}
+
+.weekTrack {
+  position: relative;
+  min-height: 3.5rem;
+}
+
+.gridLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--c-line-soft);
+}
+
+.bar {
+  position: absolute;
+  height: 2.3rem;
+  padding: 0 0.45rem;
+  overflow: hidden;
+  border-radius: 2px;
+  text-decoration: none;
+}
+
+a.bar:hover {
+  filter: brightness(1.2);
+}

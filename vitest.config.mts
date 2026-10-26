@@ -13,5 +13,6 @@ export default defineConfig({
     fileParallelism: false,
     testTimeout: 20_000,
     env: { TZ: 'UTC' },
+    setupFiles: ['tests/integration/setup.ts'],
   },
 })

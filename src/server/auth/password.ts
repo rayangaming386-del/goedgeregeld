@@ -40,3 +40,11 @@ export function generateTemporaryPassword(): string {
   for (const b of bytes) out += alphabet[b % alphabet.length]
   return `${out.slice(0, 6)}-${out.slice(6, 12)}-${out.slice(12, 18)}`
 }
+
+let dummyHash: Promise<string> | null = null
+
+/** Echte hash om de rekentijd gelijk te houden wanneer een account niet bestaat. */
+export function getDummyHash(): Promise<string> {
+  dummyHash ??= hash(crypto.randomUUID(), OPTIONS)
+  return dummyHash
+}
