@@ -1,0 +1,364 @@
+.form {
+  display: grid;
+  gap: var(--s-7);
+}
+
+.fieldset {
+  display: grid;
+  gap: var(--s-4);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  margin-bottom: var(--s-2);
+  padding: 0;
+  font-size: var(--fs-h4);
+  font-weight: 600;
+  font-stretch: var(--wdth-semi);
+  color: var(--c-bone);
+}
+
+.step {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--c-champagne);
+  font-stretch: 100%;
+}
+
+.legendHint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--c-bone-3);
+}
+
+.legendHint svg {
+  flex: none;
+  margin-top: 0.1rem;
+}
+
+/* ───────────── Autokeuze ───────────── */
+
+.vehicles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-2);
+}
+
+@media (min-width: 900px) {
+  .vehicles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.vehicleOption {
+  position: relative;
+  display: grid;
+  gap: 0.2rem;
+  min-height: 4.5rem;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-xs);
+  background: var(--c-carbon);
+  cursor: pointer;
+  transition:
+    border-color var(--d-fast) var(--ease-smooth),
+    background-color var(--d-fast) var(--ease-smooth);
+}
+
+.vehicleOption:hover {
+  border-color: var(--c-line-strong);
+}
+
+.vehicleOption input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.vehicleOption:has(input:checked) {
+  border-color: var(--c-champagne);
+  background: var(--c-champagne-wash);
+}
+
+.vehicleOption:has(input:focus-visible) {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.vehicleCode {
+  font-size: 1.25rem;
+  font-weight: 650;
+  font-stretch: var(--wdth-expanded);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.vehicleName {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--c-bone-3);
+}
+
+.vehicleOption:has(input:checked) .vehicleCode {
+  color: var(--c-champagne-hi);
+}
+
+/* ───────────── Periode en gegevens ───────────── */
+
+.periodGrid {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--s-3);
+}
+
+@media (min-width: 720px) {
+  .periodGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+}
+
+.detailsGrid {
+  display: grid;
+  gap: var(--s-4);
+}
+
+@media (min-width: 720px) {
+  .detailsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+
+  .detailsGrid > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* ───────────── Samenvatting ───────────── */
+
+.summary {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-5);
+  border: 1px solid var(--c-line);
+  border-left: 2px solid var(--c-champagne);
+  background: var(--c-graphite);
+}
+
+.summaryMain {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-stretch: var(--wdth-semi);
+}
+
+.summaryPeriod {
+  font-size: var(--fs-small);
+  font-weight: 400;
+  font-stretch: 100%;
+  color: var(--c-bone-2);
+}
+
+.summaryPrice {
+  display: grid;
+  gap: 0.25rem;
+  font-size: var(--fs-small);
+  color: var(--c-bone-2);
+}
+
+.summaryPrice strong {
+  color: var(--c-bone);
+}
+
+.summaryDeposit {
+  color: var(--c-bone-3);
+}
+
+/* ───────────── Fouten en verzenden ───────────── */
+
+.errorSummary {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-4) var(--s-5);
+  border: 1px solid rgb(229 131 119 / 0.5);
+  background: rgb(229 131 119 / 0.08);
+}
+
+.errorSummary[hidden] {
+  display: none;
+}
+
+.errorTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--c-danger);
+}
+
+.errorSummary ul {
+  display: grid;
+  gap: 0.25rem;
+  padding-left: 1.6rem;
+  font-size: var(--fs-small);
+}
+
+.errorSummary a {
+  color: var(--c-bone);
+}
+
+.failure {
+  display: grid;
+  gap: var(--s-3);
+  justify-items: start;
+  padding: var(--s-5);
+  border: 1px solid rgb(229 131 119 / 0.5);
+  background: rgb(229 131 119 / 0.08);
+  color: var(--c-bone-2);
+}
+
+.failureTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--c-danger);
+}
+
+.submitRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-4) var(--s-6);
+}
+
+@media (max-width: 479.98px) {
+  .submitRow :global(.btn) {
+    flex: 1 1 100%;
+  }
+}
+
+.waLink {
+  color: var(--c-bone-2);
+}
+
+.waLink:hover {
+  color: var(--c-bone);
+}
+
+.privacy {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--c-bone-3);
+}
+
+.privacy svg {
+  flex: none;
+  margin-top: 0.15rem;
+}
+
+.privacy a {
+  color: var(--c-bone-2);
+}
+
+/* ───────────── Bevestiging ───────────── */
+
+.success {
+  display: grid;
+  gap: var(--s-4);
+  justify-items: start;
+  padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  border: 1px solid rgb(134 181 146 / 0.4);
+  background: linear-gradient(to bottom, rgb(134 181 146 / 0.08), transparent 60%), var(--c-graphite);
+}
+
+.success:focus-visible {
+  outline-offset: 4px;
+}
+
+.successIcon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--r-pill);
+  background: rgb(134 181 146 / 0.16);
+  color: var(--c-ok);
+}
+
+.reference {
+  color: var(--c-bone-2);
+}
+
+.reference strong {
+  color: var(--c-bone);
+  font-size: 1.125rem;
+  letter-spacing: 0.06em;
+}
+
+.recap {
+  display: grid;
+  gap: var(--s-2);
+  width: 100%;
+  padding-block: var(--s-3);
+  border-block: 1px solid var(--c-line-soft);
+}
+
+.recap div {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: var(--s-3);
+}
+
+.recap dt {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-bone-3);
+  padding-top: 0.2rem;
+}
+
+.successText {
+  max-width: 56ch;
+  color: var(--c-bone-2);
+}
+
+.successActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { InlineScript } from '@/components/InlineScript'
 import { metadataBase, SITE_NAME } from '@/lib/site'
 import '@/styles/tokens.css'
 import '@/styles/base.css'
@@ -26,11 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="nl" className={`${archivo.variable} ${plexMono.variable}`} suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
-        <script
-          type={typeof window === 'undefined' ? 'text/javascript' : 'text/plain'}
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JS_FLAG }}
-        />
+        <InlineScript html={JS_FLAG} />
       </head>
       <body>{children}</body>
     </html>

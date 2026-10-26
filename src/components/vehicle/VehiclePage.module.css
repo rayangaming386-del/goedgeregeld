@@ -1,0 +1,368 @@
+.page {
+  padding-top: var(--header-h);
+  background: var(--c-ink);
+}
+
+.top {
+  padding-top: var(--s-4);
+  padding-bottom: var(--section-y-tight);
+}
+
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--c-bone-3);
+}
+
+.crumbs li + li::before {
+  content: '/';
+  margin-right: 0.6rem;
+  color: var(--c-line-strong);
+}
+
+.crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--c-bone-2);
+  text-decoration: none;
+}
+
+.crumbs a:hover {
+  color: var(--c-bone);
+}
+
+.crumbs [aria-current='page'] {
+  color: var(--c-bone);
+}
+
+.layout {
+  display: grid;
+  gap: var(--s-6);
+}
+
+/* Mobiel: galerij over de volle breedte. */
+.galleryCol {
+  margin-inline: calc(var(--gutter) * -1);
+  min-width: 0;
+}
+
+.galleryCol :global([role='region']) > ul {
+  padding-inline: var(--gutter);
+}
+
+.info {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  color: var(--c-champagne);
+}
+
+.title {
+  font-size: clamp(2.125rem, 1.5rem + 2.6vw, 3.75rem);
+  line-height: 1.02;
+}
+
+.tagline {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  color: var(--c-bone-2);
+}
+
+.priceBlock {
+  display: grid;
+  gap: var(--s-3);
+  padding-block: var(--s-5);
+  border-block: 1px solid var(--c-line-soft);
+}
+
+.keySpecs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-4) var(--s-5);
+}
+
+.keySpecs div {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.keySpecs dt {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-bone-3);
+}
+
+.keySpecs dd {
+  font-size: 1.5rem;
+  font-weight: 620;
+  font-stretch: var(--wdth-expanded);
+  letter-spacing: -0.02em;
+}
+
+.keySpecs dd span {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-stretch: 100%;
+  letter-spacing: 0.04em;
+  color: var(--c-bone-3);
+}
+
+.ctas {
+  display: grid;
+  gap: var(--s-2);
+}
+
+.reassure {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--c-bone-3);
+}
+
+.reassure svg {
+  flex: none;
+  margin-top: 0.15rem;
+}
+
+@media (min-width: 720px) {
+  .galleryCol {
+    margin-inline: 0;
+  }
+
+  .galleryCol :global([role='region']) > ul {
+    padding-inline: 0;
+  }
+}
+
+@media (min-width: 1080px) {
+  .layout {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(2.5rem, 1rem + 3vw, 5rem);
+    align-items: start;
+    margin-top: var(--s-3);
+  }
+
+  .infoCol {
+    position: sticky;
+    top: calc(var(--header-h) + var(--s-5));
+  }
+
+  .ctas {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ctas :global(.btn) {
+    white-space: normal;
+  }
+}
+
+/* ───────────── Details ───────────── */
+
+.details {
+  display: grid;
+  gap: var(--s-6);
+  padding-bottom: var(--section-y);
+}
+
+.detailsIntro {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+}
+
+.detailsBody {
+  display: grid;
+  gap: var(--s-7);
+  min-width: 0;
+}
+
+.prose {
+  display: grid;
+  gap: var(--s-4);
+  max-width: 62ch;
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+  color: var(--c-bone-2);
+}
+
+.block {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+}
+
+.highlights {
+  list-style: none;
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--c-line-soft);
+}
+
+.highlights li {
+  position: relative;
+  padding: 0.9rem 0 0.9rem 1.75rem;
+  border-bottom: 1px solid var(--c-line-soft);
+  color: var(--c-bone);
+}
+
+.highlights li::before {
+  content: '';
+  position: absolute;
+  left: 0.15rem;
+  top: 1.3rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--c-champagne);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
+.tables {
+  display: grid;
+  gap: var(--s-7);
+}
+
+.table {
+  display: grid;
+  border-top: 1px solid var(--c-line-soft);
+}
+
+.table div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-block: 0.9rem;
+  border-bottom: 1px solid var(--c-line-soft);
+}
+
+.table dt {
+  color: var(--c-bone-3);
+}
+
+.table dd {
+  text-align: right;
+  color: var(--c-bone);
+}
+
+.termsNote {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--c-bone-3);
+}
+
+.termsNote a {
+  color: var(--c-bone-2);
+}
+
+.source {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 70ch;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--c-bone-3);
+}
+
+.source svg {
+  flex: none;
+  margin-top: 0.15rem;
+  color: var(--c-champagne);
+}
+
+@media (min-width: 900px) {
+  .tables {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-8);
+  }
+}
+
+@media (min-width: 1080px) {
+  .details {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--s-9);
+  }
+
+  .detailsIntro {
+    position: sticky;
+    top: calc(var(--header-h) + var(--s-7));
+  }
+}
+
+/* ───────────── Aanvraag ───────────── */
+
+.requestSection {
+  padding-block: var(--section-y-tight);
+  scroll-margin-top: var(--header-h);
+}
+
+.requestGrid {
+  display: grid;
+  gap: var(--s-7);
+}
+
+.requestIntro {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+}
+
+.requestForm {
+  min-width: 0;
+}
+
+@media (min-width: 1080px) {
+  .requestGrid {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: var(--s-9);
+  }
+
+  .requestIntro {
+    position: sticky;
+    top: calc(var(--header-h) + var(--s-7));
+  }
+}
+
+/* ───────────── Andere auto’s ───────────── */
+
+.othersHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-bottom: var(--s-7);
+}
+
+.othersGrid {
+  list-style: none;
+  display: grid;
+  gap: var(--s-5);
+}
+
+@media (min-width: 720px) {
+  .othersGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  .othersGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-4);
+  }
+}

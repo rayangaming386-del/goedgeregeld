@@ -11,6 +11,7 @@ import {
   publicDeposit,
   type PricingRules,
   type PromotionRule,
+  type RateCard,
   type PublicDayPrice,
   type PublicDeposit,
   type PublicationMode,
@@ -272,4 +273,64 @@ export const getPublishedPage = cache(async (slug: string): Promise<PublicPage |
 export const getPublishedPageSlugs = cache(async (): Promise<string[]> => {
   const rows = await getDb().select({ slug: pages.slug }).from(pages).where(eq(pages.status, 'gepubliceerd'))
   return rows.map((r) => r.slug)
+})
+
+/**
+ * Invoer voor een prijsberekening in het aanvraagformulier. Alleen beschikbaar
+ * als de tariefregels én de dagprijs van de auto door de eigenaar zijn bevestigd;
+ * weekend- en weektarief en aanvullende kosten alleen als ook die bevestigd zijn.
+ */
+export const getQuoteInputs = cache(async (): Promise<Map<string, { rate: RateCard; promotions: PromotionRule[] }>> => {
+  const ctx = await getPublicContext()
+  const result = new Map<string, { rate: RateCard; promotions: PromotionRule[] }>()
+  if (!ctx.rules.confirmed || !ctx.rules.dayCounting) return result
+  const db = getDb()
+  const rows = await db
+    .select({
+      id: vehicles.id,
+      slug: vehicles.slug,
+      dayRateCents: vehicles.dayRateCents,
+      weekendRateCents: vehicles.weekendRateCents,
+      weekRateCents: vehicles.weekRateCents,
+      depositCents: vehicles.depositCents,
+      extraCosts: vehicles.extraCosts,
+    })
+    .from(vehicles)
+    .where(eq(vehicles.status, 'gepubliceerd'))
+  if (!rows.length) return result
+  const ids = rows.map((r) => r.id)
+  const [ver, promos] = await Promise.all([
+    db.select({ vehicleId: vehicleVerifications.vehicleId, field: vehicleVerifications.field }).from(vehicleVerifications).where(inArray(vehicleVerifications.vehicleId, ids)),
+    db
+      .select({
+        vehicleId: promotionVehicles.vehicleId,
+        id: promotions.id,
+        title: promotions.title,
+        kind: promotions.kind,
+        value: promotions.value,
+        startsAt: promotions.startsAt,
+        endsAt: promotions.endsAt,
+      })
+      .from(promotions)
+      .innerJoin(promotionVehicles, eq(promotionVehicles.promotionId, promotions.id))
+      .where(and(eq(promotions.status, 'gepubliceerd'), gt(promotions.endsAt, ctx.now), inArray(promotionVehicles.vehicleId, ids))),
+  ])
+  for (const r of rows) {
+    const confirmed = new Set(ver.filter((v) => v.vehicleId === r.id).map((v) => v.field))
+    if (!confirmed.has('dagprijs') || r.dayRateCents === null) continue
+    const rulesOk = confirmed.has('tariefregels')
+    result.set(r.slug, {
+      rate: {
+        dayRateCents: r.dayRateCents,
+        weekendRateCents: rulesOk ? r.weekendRateCents : null,
+        weekRateCents: rulesOk ? r.weekRateCents : null,
+        depositCents: confirmed.has('borg') ? r.depositCents : null,
+        extraCosts: rulesOk ? r.extraCosts : [],
+      },
+      promotions: promos
+        .filter((p) => p.vehicleId === r.id)
+        .map((p) => ({ id: p.id, title: p.title, kind: p.kind, value: p.value, startsAt: p.startsAt, endsAt: p.endsAt })),
+    })
+  }
+  return result
 })

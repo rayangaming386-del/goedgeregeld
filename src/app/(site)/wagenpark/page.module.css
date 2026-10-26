@@ -1,0 +1,4 @@
+.page {
+  padding-top: var(--header-h);
+  background: var(--c-ink);
+}
