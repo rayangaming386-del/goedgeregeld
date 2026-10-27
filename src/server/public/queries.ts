@@ -5,7 +5,7 @@
  */
 import { and, asc, eq, gt, inArray } from 'drizzle-orm'
 import { cache } from 'react'
-import type { SiteContent } from '@/domain/content'
+import { DEFAULT_CONTENT, SETTINGS, type SettingKey, type SiteContent } from '@/domain/content'
 import {
   publicDayPrice,
   publicDeposit,
@@ -19,6 +19,7 @@ import {
 import { getSiteContent } from '../content/settings'
 import { getDb } from '../db/client'
 import { faqs, media, pages, promotions, promotionVehicles, vehicles, vehicleVerifications } from '../db/schema'
+import { isPreview, previewData } from '../preview'
 import { toPublicImage, type PublicImage } from './images'
 
 export type VerificationField = 'dagprijs' | 'borg' | 'tariefregels' | 'specificaties' | 'voorwaarden' | 'uitvoering' | 'fotos'
@@ -31,8 +32,18 @@ export type PublicContext = {
   now: Date
 }
 
+/** Voorbeeldversie: standaardinhoud met de beelden uit de startinhoud. */
+function previewSiteContent(): SiteContent {
+  const content = structuredClone(DEFAULT_CONTENT) as SiteContent
+  for (const [key, value] of Object.entries(previewData().settings)) {
+    const parsed = SETTINGS[key as SettingKey]?.safeParse(value)
+    if (parsed?.success) (content as Record<string, unknown>)[key] = parsed.data
+  }
+  return content
+}
+
 export const getPublicContext = cache(async (): Promise<PublicContext> => {
-  const content = await getSiteContent()
+  const content = isPreview() ? previewSiteContent() : await getSiteContent()
   return {
     content,
     mode: content.publication.mode,
@@ -87,7 +98,7 @@ function paragraphs(text: string): string[] {
 
 type VehicleSelector = 'all' | { slug: string } | { previewId: string }
 
-async function loadVehicles(where: VehicleSelector, ctx: PublicContext): Promise<PublicVehicle[]> {
+async function dbVehicleRows(where: VehicleSelector, ctx: PublicContext) {
   const db = getDb()
   const rows = await db
     .select({
@@ -125,7 +136,7 @@ async function loadVehicles(where: VehicleSelector, ctx: PublicContext): Promise
           : eq(vehicles.id, where.previewId),
     )
     .orderBy(asc(vehicles.sortOrder), asc(vehicles.name))
-  if (rows.length === 0) return []
+  if (rows.length === 0) return { rows, photoRows: [], verificationRows: [], promoRows: [] }
   const ids = rows.map((r) => r.id)
 
   const [photoRows, verificationRows, promoRows] = await Promise.all([
@@ -162,6 +173,29 @@ async function loadVehicles(where: VehicleSelector, ctx: PublicContext): Promise
       .innerJoin(promotionVehicles, eq(promotionVehicles.promotionId, promotions.id))
       .where(and(eq(promotions.status, 'gepubliceerd'), gt(promotions.endsAt, ctx.now), inArray(promotionVehicles.vehicleId, ids))),
   ])
+  return { rows, photoRows, verificationRows, promoRows }
+}
+
+type VehicleRows = Awaited<ReturnType<typeof dbVehicleRows>>
+
+/** Voorbeeldversie: dezelfde rijen, uit de startinhoud. Niets is bevestigd, er zijn geen acties. */
+function previewVehicleRows(where: VehicleSelector): VehicleRows {
+  const data = previewData()
+  const rows = data.vehicles
+    .filter((v) => (where === 'all' ? true : 'slug' in where ? v.slug === where.slug : v.id === where.previewId))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map(({ sortOrder: _s, ...v }) => ({ ...v, updatedAt: new Date(v.updatedAt) }))
+  const ids = new Set(rows.map((r) => r.id))
+  const photoRows = data.photos
+    .filter((p) => p.vehicleId && ids.has(p.vehicleId))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map(({ sortOrder: _s, ...p }) => p)
+  return { rows, photoRows, verificationRows: [], promoRows: [] } as VehicleRows
+}
+
+async function loadVehicles(where: VehicleSelector, ctx: PublicContext): Promise<PublicVehicle[]> {
+  const { rows, photoRows, verificationRows, promoRows } = isPreview() ? previewVehicleRows(where) : await dbVehicleRows(where, ctx)
+  if (rows.length === 0) return []
 
   const live = ctx.mode === 'live'
   const preview = typeof where === 'object' && 'previewId' in where
@@ -248,6 +282,9 @@ export async function getVehicleForPreview(id: string): Promise<PublicVehicle | 
 export const getPublicImages = cache(async (ids: Array<string | null | undefined>): Promise<Map<string, PublicImage>> => {
   const wanted = ids.filter((id): id is string => Boolean(id))
   if (wanted.length === 0) return new Map()
+  if (isPreview()) {
+    return new Map(previewData().photos.filter((p) => wanted.includes(p.id)).map((p) => [p.id, toPublicImage(p)]))
+  }
   const rows = await getDb()
     .select({
       id: media.id,
@@ -267,6 +304,7 @@ export const getPublicImages = cache(async (ids: Array<string | null | undefined
 export type PublicFaq = { id: string; question: string; answer: string[] }
 
 export const getPublishedFaqs = cache(async (): Promise<PublicFaq[]> => {
+  if (isPreview()) return previewData().faqs.map((f) => ({ id: f.id, question: f.question, answer: paragraphs(f.answer) }))
   const rows = await getDb()
     .select({ id: faqs.id, question: faqs.question, answer: faqs.answer })
     .from(faqs)
@@ -278,6 +316,8 @@ export const getPublishedFaqs = cache(async (): Promise<PublicFaq[]> => {
 export type PublicPage = { slug: string; title: string; body: string; updatedAt: Date }
 
 export const getPublishedPage = cache(async (slug: string): Promise<PublicPage | null> => {
+  // Privacy en voorwaarden zijn in de startinhoud nog concept.
+  if (isPreview()) return null
   const [row] = await getDb()
     .select({ slug: pages.slug, title: pages.title, body: pages.body, updatedAt: pages.updatedAt })
     .from(pages)
@@ -286,6 +326,7 @@ export const getPublishedPage = cache(async (slug: string): Promise<PublicPage |
 })
 
 export const getPublishedPageSlugs = cache(async (): Promise<string[]> => {
+  if (isPreview()) return []
   const rows = await getDb().select({ slug: pages.slug }).from(pages).where(eq(pages.status, 'gepubliceerd'))
   return rows.map((r) => r.slug)
 })
@@ -298,7 +339,7 @@ export const getPublishedPageSlugs = cache(async (): Promise<string[]> => {
 export const getQuoteInputs = cache(async (): Promise<Map<string, { rate: RateCard; promotions: PromotionRule[] }>> => {
   const ctx = await getPublicContext()
   const result = new Map<string, { rate: RateCard; promotions: PromotionRule[] }>()
-  if (!ctx.rules.confirmed || !ctx.rules.dayCounting) return result
+  if (!ctx.rules.confirmed || !ctx.rules.dayCounting || isPreview()) return result
   const db = getDb()
   const rows = await db
     .select({

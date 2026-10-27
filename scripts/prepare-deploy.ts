@@ -13,6 +13,9 @@
  *
  * Alles gebeurt onder één databaselock, zodat gelijktijdige builds elkaar niet
  * storen. Wachtwoorden, e-mailadressen en verbindingsgegevens komen niet in de log.
+ *
+ * Zonder DATABASE_URL wordt in plaats daarvan de voorbeeldversie gebouwd: de
+ * website met de startinhoud, zonder beheer en zonder het opslaan van aanvragen.
  */
 import { count, eq } from 'drizzle-orm'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
@@ -21,6 +24,7 @@ import { createUser } from '../src/server/auth/users'
 import { closeDb, getDb, getPool } from '../src/server/db/client'
 import { auditLog, users } from '../src/server/db/schema'
 import { getStorage, storageKind } from '../src/server/storage'
+import { buildPreview } from './build-preview'
 import { loadEnv } from './env'
 import { seedContent } from './seed-content'
 
@@ -30,13 +34,6 @@ function configProblems(): string[] {
   const onVercel = Boolean(process.env.VERCEL)
   const where = onVercel ? ' in Vercel → Settings → Environment Variables' : ' in de omgeving (zie .env.example)'
   const problems: string[] = []
-  if (!process.env.DATABASE_URL) {
-    problems.push(
-      onVercel
-        ? 'DATABASE_URL ontbreekt. Koppel een Postgres-database: Vercel → dit project → Storage → Create Database → Neon (regio Frankfurt) en verbind die met het project.'
-        : 'DATABASE_URL ontbreekt. Zie .env.example.',
-    )
-  }
   if ((process.env.APP_SECRET ?? '').length < 32) {
     problems.push(`APP_SECRET ontbreekt of is korter dan 32 tekens. Zet een lange willekeurige waarde${where}, bijvoorbeeld de uitvoer van: openssl rand -base64 48`)
   }
@@ -56,6 +53,15 @@ function configProblems(): string[] {
 
 async function main() {
   loadEnv()
+  if (!process.env.DATABASE_URL) {
+    console.log('Geen database gekoppeld (DATABASE_URL ontbreekt): de voorbeeldversie wordt gebouwd.')
+    console.log('Foto’s verwerken…')
+    const result = await buildPreview()
+    console.log(`✓ Voorbeeldversie klaar: ${result.vehicles} auto’s, ${result.photos} foto’s.`)
+    console.log('! Zonder database werken het beheer en het versturen van aanvragen niet; de website zegt dat ook.')
+    console.log('  Database koppelen: Vercel → dit project → Storage → Create Database → Neon (regio Frankfurt), daarna opnieuw deployen.')
+    return
+  }
   const problems = configProblems()
   if (problems.length) {
     console.error('\nDe deployment kan nog niet worden voorbereid:\n')

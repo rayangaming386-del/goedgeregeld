@@ -117,7 +117,14 @@ De repository bevat een `vercel.json`. Vercel voert bij elke deployment eerst
 ook de startinhoud) en bouwt daarna de site. De serverfuncties draaien in
 Frankfurt (`fra1`), dicht bij de klanten en bij de database.
 
-Eenmalig instellen:
+**Eerst alleen kijken kan ook.** Zonder gekoppelde database bouwt Vercel een
+voorbeeldversie: de complete website met de vier auto’s, foto’s en teksten uit
+`bronmateriaal/`, zonder instellingen. Het beheer en het versturen van
+aanvragen werken dan niet; dat staat ook op de website (het formulier meldt
+“Niet verstuurd” en verwijst naar WhatsApp). Zodra er een database is
+gekoppeld, wordt bij de volgende deployment de volledige versie gebouwd.
+
+Eenmalig instellen voor de volledige versie:
 
 1. **Database.** Vercel → het project → *Storage* → *Create Database* →
    **Neon** (Postgres). Kies de regio *Frankfurt (eu-central-1)*, koppel de
@@ -138,8 +145,8 @@ Eenmalig instellen:
 
 Goed om te weten:
 
-- **Ontbreekt er iets**, dan stopt de build met een uitleg in gewone taal in de
-  buildlog (bijvoorbeeld: geen database gekoppeld, `APP_SECRET` te kort).
+- **Ontbreekt er iets** terwijl er wél een database is, dan stopt de build met
+  een uitleg in gewone taal in de buildlog (bijvoorbeeld: `APP_SECRET` te kort).
 - **Latere deployments overschrijven niets.** De startinhoud wordt alleen
   geladen in een database waar dat nog nooit is gebeurd en nog geen account
   bestaat; het eigenaar-account alleen zolang er nog geen enkel account is.

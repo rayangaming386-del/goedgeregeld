@@ -5,6 +5,7 @@ import { RequestForm } from '@/components/request/RequestForm'
 import { getRequestVehicles } from '@/components/request/request-data'
 import { pageMetadata } from '@/lib/seo'
 import { availabilityMessage, whatsappUrl } from '@/lib/whatsapp'
+import { isPreview } from '@/server/preview'
 import { getPublicContext, getPublishedPageSlugs } from '@/server/public/queries'
 import styles from './page.module.css'
 
@@ -42,6 +43,12 @@ export default async function RequestPage({ searchParams }: PageProps<'/aanvrage
             <Info size={16} />
             <span>{process.note}</span>
           </p>
+          {isPreview() ? (
+            <p className={styles.note} role="note">
+              <Info size={16} />
+              <span>Voorbeeldversie: aanvragen via dit formulier worden nog niet verstuurd of opgeslagen. Gebruik WhatsApp.</span>
+            </p>
+          ) : null}
           <a
             className={`btn btn--secondary ${styles.wa}`}
             href={whatsappUrl(contact.whatsapp, availabilityMessage({}))}

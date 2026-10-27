@@ -55,6 +55,8 @@ const nextConfig: NextConfig = {
   typedRoutes: false,
   // Native modules blijven buiten de bundel.
   serverExternalPackages: ['sharp', '@node-rs/argon2', 'pg'],
+  // Voorbeeldversie zonder database: de startinhoud moet mee naar de server.
+  outputFileTracingIncludes: { '/**': ['./.preview/data.json'] },
   experimental: {
     // De CSS is klein (±5 kB gzip). Inline scheelt bij het eerste bezoek een
     // render-blokkerende ronde; gemeten met DevTools-throttling: FCP ±0,6 s sneller.

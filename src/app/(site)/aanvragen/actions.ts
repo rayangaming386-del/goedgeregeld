@@ -7,6 +7,7 @@ import { formatPeriod } from '@/domain/time'
 import { absoluteUrl } from '@/lib/site'
 import { getDb } from '@/server/db/client'
 import { notifyNewRequest } from '@/server/mail'
+import { isPreview, PREVIEW_REQUEST_MESSAGE } from '@/server/preview'
 import { getPublishedVehicle } from '@/server/public/queries'
 import { clientIp } from '@/server/client-ip'
 import { hashKey, hitRateLimit } from '@/server/rate-limit'
@@ -32,6 +33,8 @@ function field(fd: FormData, key: keyof RequestInput | 'website' | 'startedAt'):
  * database staat. Een aanvraag is geen reservering en blokkeert de auto niet.
  */
 export async function submitRequest(_prev: RequestState, formData: FormData): Promise<RequestState> {
+  // Zonder database kan er niets worden opgeslagen: nooit een succesmelding.
+  if (isPreview()) return { status: 'error', message: PREVIEW_REQUEST_MESSAGE }
   // Spam: een verborgen veld dat mensen niet zien, en een minimale invultijd.
   if (field(formData, 'website')) return { status: 'error', message: GENERIC_ERROR }
   const startedAt = Number(field(formData, 'startedAt'))

@@ -65,6 +65,7 @@ conceptmodus (niet vindbaar) tot de eigenaar hem in de publicatiecheck live zet.
 | Onderdeel | Wat er nodig is |
 |---|---|
 | E-mailmelding bij een nieuwe aanvraag | Resend-account, `RESEND_API_KEY`, `MAIL_FROM`, `MAIL_TO`. De code is er; niet getest met een echte sleutel. |
+| Voorbeeldversie zonder database | Zonder `DATABASE_URL` bouwt de deployment de website met de startinhoud (foto’s als vaste bestanden); beheer en aanvragen staan uit en de website zegt dat. Lokaal getest als Vercel-build zonder enige instelling: alle pagina’s 200, geen kapotte beelden of consolefouten op desktop en mobiel, het formulier toont “Niet verstuurd” en nooit een succesmelding. |
 | Vercel | `vercel.json` (build met voorbereiding, regio Frankfurt), foto’s in de database en het verkleinen van grote uploads zijn er en zijn getest in een nagebootste Vercel-omgeving (§3). Op het echte Vercel-platform heb ik niets kunnen testen. Nodig: een Neon-database koppelen, `APP_SECRET` en voor het eerste account `SEED_OWNER_EMAIL` en `SEED_OWNER_PASSWORD` (README → “Op Vercel zetten”). |
 | S3-compatibele foto-opslag | Bucket en sleutels (`MEDIA_STORAGE=s3`). Code en CSP-aanpassing zijn er; niet getest tegen een echte bucket. Alternatief voor opslag in de database. |
 | Domein en vindbaarheid | `SITE_URL` en daarna “Vindbaar maken” in de publicatiecheck. |

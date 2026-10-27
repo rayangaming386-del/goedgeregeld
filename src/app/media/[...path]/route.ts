@@ -1,4 +1,5 @@
 import { contentTypeForVariant, VARIANT_CACHE_CONTROL } from '@/server/media/pipeline'
+import { isPreview } from '@/server/preview'
 import { getStorage, PUBLIC_PREFIX } from '@/server/storage'
 
 /**
@@ -8,6 +9,8 @@ import { getStorage, PUBLIC_PREFIX } from '@/server/storage'
  */
 export async function GET(_req: Request, ctx: { params: Promise<{ path: string[] }> }) {
   const { path } = await ctx.params
+  // In de voorbeeldversie staan de foto’s als vaste bestanden in public/media/; wat daar niet is, bestaat niet.
+  if (isPreview()) return new Response('Niet gevonden', { status: 404 })
   const rel = path.join('/')
   if (!/^[0-9a-f-]{36}\/[0-9a-f]{8}\/\d{2,5}\.(avif|webp|jpg)$/.test(rel)) {
     return new Response('Niet gevonden', { status: 404 })
