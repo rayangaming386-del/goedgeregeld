@@ -14,12 +14,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "node --test tests/e2e/",
+    "test:e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
     "db:setup": "pnpm db:migrate && pnpm db:seed",
-    "user:create": "tsx scripts/create-user.ts"
+    "user:create": "tsx scripts/create-user.ts",
+    "user:reset-password": "tsx scripts/reset-password.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "2.2.2",
@@ -42,6 +43,7 @@
     "@types/pg": "^8.23.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "^19.3.0",
+    "axe-core": "4.11.0",
     "drizzle-kit": "0.31.11",
     "tsx": "4.23.15",
     "typescript": "5.9.3",

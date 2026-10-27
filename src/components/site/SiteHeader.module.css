@@ -4,7 +4,12 @@
   z-index: var(--z-header);
   height: var(--header-h);
   color: var(--c-bone);
-  will-change: transform;
+  transition: transform 0.55s var(--ease-in-out);
+}
+
+/* Verborgen bij omlaag scrollen; zichtbaar bij omhoog scrollen of focus. */
+.header[data-hidden='true'] {
+  transform: translateY(-100%);
 }
 
 /* Achtergrondlaag: transparant boven de hero, rustig dekkend tijdens het scrollen. */

@@ -92,7 +92,9 @@ Minimale aanraakgrootte 48 × 48 px.
 
 Principes: beweging maakt hiërarchie zichtbaar; alleen `transform` en `opacity`; geen permanente animaties buiten beeld; alles werkt zonder JavaScript en met `prefers-reduced-motion` (dan: geen parallax, geen pin, stilstaande marquee).
 
-De hero-intro draait in CSS zodat hij op de eerste paint start en niet op JavaScript wacht (LCP). GSAP/ScrollTrigger verzorgt al het scrollgedrag: kopreveals, kaarten, parallax, de signature-sectie, header en marquee.
+De hero-intro draait in CSS zodat hij op de eerste paint start en niet op JavaScript wacht (LCP). GSAP verzorgt het scrollgedrag: kopreveals, kaarten, parallax, de signature-sectie en de marquee. De header verbergt en toont zich met een eigen lichte scroll-listener en een CSS-transitie.
+
+GSAP wordt als aparte bundel pas geladen na het `load`-event, zodra de browser vrij is, en elke component start in een eigen taak. Eenmalige reveals lopen via een IntersectionObserver (geen layoutmetingen bij het starten); koppen worden pas in regels gesplitst vlak voordat ze in beeld komen. Wat bij het starten al in beeld staat, wordt niet meer verborgen. Zonder JavaScript of met `prefers-reduced-motion: reduce` is alles direct zichtbaar.
 
 ## Gedrag per schermformaat
 

@@ -48,12 +48,15 @@ export function VehicleDetailView({ ctx, vehicle, all, requestVehicles, legalPag
       ? {
           offers: {
             '@type': 'Offer',
+            // Verhuur, geen verkoop.
+            businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut',
             priceCurrency: 'EUR',
             priceSpecification: {
               '@type': 'UnitPriceSpecification',
               price: (vehicle.price.promotion?.dayRateCents ?? vehicle.price.dayRateCents) / 100,
               priceCurrency: 'EUR',
               unitCode: 'DAY',
+              ...(ctx.rules.confirmed && ctx.rules.vat !== 'onbekend' ? { valueAddedTaxIncluded: ctx.rules.vat === 'inclusief' } : {}),
             },
           },
         }

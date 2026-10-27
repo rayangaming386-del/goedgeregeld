@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowRight, Close, Instagram, Menu, WhatsApp } from '@/components/icons'
-import { ensureGsap, prefersReducedMotion, useIsoLayoutEffect } from '@/components/motion/gsap-client'
+import { loadedGsap, loadGsap, prefersReducedMotion, whenIdle } from '@/components/motion/gsap-client'
 import { whatsappUrl } from '@/lib/whatsapp'
 import styles from './SiteHeader.module.css'
 
@@ -53,42 +53,47 @@ export function SiteHeader({ conceptMode, contact, vehicles }: Props) {
   const menuOpenRef = useRef(false)
 
   // Header: dekkend na de eerste scroll, verbergen bij omlaag scrollen, tonen bij omhoog.
-  useIsoLayoutEffect(() => {
+  // Een lichte scroll-listener met een CSS-transitie; geen animatiebibliotheek nodig.
+  useEffect(() => {
     const header = headerRef.current
     if (!header) return
-    const { gsap, ScrollTrigger } = ensureGsap()
-    let hidden = false
     const setHidden = (value: boolean) => {
-      if (value === hidden) return
-      hidden = value
-      if (prefersReducedMotion()) {
-        gsap.set(header, { yPercent: value ? -100 : 0 })
-      } else {
-        gsap.to(header, { yPercent: value ? -100 : 0, duration: 0.55, ease: 'power3.inOut', overwrite: true })
-      }
+      header.dataset.hidden = value ? 'true' : 'false'
     }
-    const st = ScrollTrigger.create({
-      start: 0,
-      end: 'max',
-      onUpdate(self) {
-        const y = self.scroll()
-        setSolid(!overlay || y > 24)
-        if (menuOpenRef.current) return setHidden(false)
-        if (y < 240) setHidden(false)
-        else if (self.direction === 1 && Math.abs(self.getVelocity()) > 20) setHidden(true)
-        else if (self.direction === -1) setHidden(false)
-      },
-    })
-    setSolid(!overlay || window.scrollY > 24)
+    let lastY = window.scrollY
+    let lastT = performance.now()
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const y = window.scrollY
+      const now = performance.now()
+      const dy = y - lastY
+      const speed = (Math.abs(dy) / Math.max(1, now - lastT)) * 1000
+      lastY = y
+      lastT = now
+      setSolid(!overlay || y > 24)
+      if (menuOpenRef.current || y < 240) setHidden(false)
+      else if (dy > 0 && speed > 20) setHidden(true)
+      else if (dy < 0) setHidden(false)
+    }
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
     // Focus in de header (bijv. via Tab) maakt hem altijd zichtbaar.
     const onFocus = () => setHidden(false)
     header.addEventListener('focusin', onFocus)
     return () => {
-      st.kill()
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
       header.removeEventListener('focusin', onFocus)
-      gsap.set(header, { clearProps: 'transform' })
+      setHidden(false)
     }
   }, [overlay])
+
+  // De menu-animatie gebruikt GSAP; laad het op de achtergrond zodra de pagina rustig is.
+  useEffect(() => whenIdle(() => void loadGsap(), 3000), [])
 
   const openMenu = useCallback(() => {
     const dialog = dialogRef.current
@@ -97,8 +102,10 @@ export function SiteHeader({ conceptMode, contact, vehicles }: Props) {
     dialog.showModal()
     menuOpenRef.current = true
     setMenuOpen(true)
-    if (prefersReducedMotion()) return
-    const { gsap } = ensureGsap()
+    const g = loadedGsap()
+    // Zonder GSAP (nog niet geladen) of met reduced motion: direct open, zonder animatie.
+    if (prefersReducedMotion() || !g) return
+    const { gsap } = g
     tlRef.current?.kill()
     const items = panel.querySelectorAll('[data-menu-item]')
     tlRef.current = gsap
@@ -117,8 +124,9 @@ export function SiteHeader({ conceptMode, contact, vehicles }: Props) {
       setMenuOpen(false)
     }
     tlRef.current?.kill()
-    if (immediate || prefersReducedMotion() || !panel) return finish()
-    const { gsap } = ensureGsap()
+    const g = loadedGsap()
+    if (immediate || prefersReducedMotion() || !panel || !g) return finish()
+    const { gsap } = g
     tlRef.current = gsap
       .timeline({ onComplete: finish })
       .to(panel.querySelectorAll('[data-menu-item]'), { y: -16, opacity: 0, duration: 0.22, stagger: 0.02, ease: 'power2.in' })

@@ -8,6 +8,7 @@ import { absoluteUrl } from '@/lib/site'
 import { getDb } from '@/server/db/client'
 import { notifyNewRequest } from '@/server/mail'
 import { getPublishedVehicle } from '@/server/public/queries'
+import { clientIp } from '@/server/client-ip'
 import { hashKey, hitRateLimit } from '@/server/rate-limit'
 import { createWebsiteRequest } from '@/server/reservations/service'
 
@@ -59,7 +60,7 @@ export async function submitRequest(_prev: RequestState, formData: FormData): Pr
     }
 
     const h = await headers()
-    const ip = h.get('x-forwarded-for')?.split(',')[0]?.trim() || h.get('x-real-ip') || 'onbekend'
+    const ip = clientIp(h)
     const ipKey = hashKey(`ip:${ip}`)
     const burst = await hitRateLimit(db, `aanvraag:10m:${ipKey}`, 5, 600)
     const daily = await hitRateLimit(db, `aanvraag:24h:${ipKey}`, 20, 86_400)

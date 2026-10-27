@@ -3,7 +3,11 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   resolve: {
-    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // Node lost dit pakket zelf op (zonder react-server-conditie); in tests is alles server.
+      'server-only': fileURLToPath(new URL('./tests/support/server-only.ts', import.meta.url)),
+    },
     conditions: ['react-server'],
   },
   test: {

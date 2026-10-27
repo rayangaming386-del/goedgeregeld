@@ -10,6 +10,7 @@ import { createSession, destroyAllSessions, destroySession, getCurrentUser } fro
 import { findUserByEmail, normalizeEmail, setPassword } from '@/server/auth/users'
 import { getDb } from '@/server/db/client'
 import { users } from '@/server/db/schema'
+import { clientIp } from '@/server/client-ip'
 import { clearRateLimit, hashKey, hitRateLimit } from '@/server/rate-limit'
 import type { ActionState } from '@/components/admin/action-state'
 
@@ -22,12 +23,14 @@ export async function login(_prev: ActionState, formData: FormData): Promise<Act
 
   const db = getDb()
   const h = await headers()
-  const ip = h.get('x-forwarded-for')?.split(',')[0]?.trim() || h.get('x-real-ip') || 'onbekend'
+  const ip = clientIp(h)
   const ipKey = hashKey(`ip:${ip}`)
   const accountKey = `login:${hashKey(`${email}|${ip}`)}`
   const perAccount = await hitRateLimit(db, accountKey, 6, 15 * 60)
   const perIp = await hitRateLimit(db, `login-ip:${ipKey}`, 40, 15 * 60)
-  if (!perAccount.allowed || !perIp.allowed) {
+  // Los van het IP-adres: beschermt een account ook als het adres wisselt.
+  const perEmail = await hitRateLimit(db, `login-email:${hashKey(email)}`, 30, 15 * 60)
+  if (!perAccount.allowed || !perIp.allowed || !perEmail.allowed) {
     return { ok: false, message: 'Te veel inlogpogingen. Wacht een kwartier en probeer het opnieuw.' }
   }
 

@@ -29,6 +29,7 @@ export default async function FleetPage() {
       <FleetSection
         id="wagenpark-overzicht"
         level="h1"
+        priorityFirst
         intro={{ ...ctx.content.fleetIntro, eyebrow: 'Wagenpark', title: 'Het wagenpark.' }}
         vehicles={vehicles}
         showIndicationNote={showIndicationNote}

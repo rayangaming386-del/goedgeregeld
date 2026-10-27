@@ -11,9 +11,11 @@ type Props = {
   showIndicationNote: boolean
   level?: 'h1' | 'h2'
   id?: string
+  /** Op de wagenparkpagina staat de eerste kaart bovenaan: direct laden. */
+  priorityFirst?: boolean
 }
 
-export function FleetSection({ intro, vehicles, showIndicationNote, level = 'h2', id = 'wagenpark' }: Props) {
+export function FleetSection({ intro, vehicles, showIndicationNote, level = 'h2', id = 'wagenpark', priorityFirst = false }: Props) {
   return (
     <section id={id} className={`section surface-ink ${styles.section}`} aria-labelledby={`${id}-titel`}>
       <div className="container">
@@ -22,7 +24,7 @@ export function FleetSection({ intro, vehicles, showIndicationNote, level = 'h2'
           <ul className={styles.grid} data-reveal="stagger">
             {vehicles.map((v, i) => (
               <li key={v.id}>
-                <VehicleCard vehicle={v} index={i} headingLevel={level === 'h1' ? 'h2' : 'h3'} />
+                <VehicleCard vehicle={v} index={i} headingLevel={level === 'h1' ? 'h2' : 'h3'} priority={priorityFirst && i === 0} />
               </li>
             ))}
           </ul>

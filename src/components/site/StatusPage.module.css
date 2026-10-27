@@ -1,0 +1,47 @@
+.page {
+  display: grid;
+  align-content: center;
+  min-height: min(80svh, 46rem);
+  padding-block: calc(var(--header-h) + var(--s-8)) var(--s-9);
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-champagne);
+}
+
+.title {
+  max-width: 18ch;
+  margin-top: var(--s-4);
+}
+
+.text {
+  max-width: 42ch;
+  margin-top: var(--s-5);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-top: var(--s-7);
+}
+
+/* Zelfstandige variant (buiten de websitelay-out): logo bovenaan. */
+.standalone {
+  min-height: 100svh;
+  padding-block: var(--s-8);
+}
+
+.logo {
+  display: inline-block;
+  margin-bottom: var(--s-9);
+}
+
+.logo img {
+  width: 9.5rem;
+  height: auto;
+}

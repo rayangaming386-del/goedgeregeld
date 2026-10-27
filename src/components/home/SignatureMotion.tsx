@@ -1,6 +1,6 @@
 'use client'
 
-import { ensureGsap, useIsoLayoutEffect } from '@/components/motion/gsap-client'
+import { useGsapEffect } from '@/components/motion/gsap-client'
 import { formatInt } from '@/lib/format'
 
 const STICKY_QUERY = '(min-width: 1080px) and (prefers-reduced-motion: no-preference)'
@@ -12,10 +12,9 @@ const STICKY_QUERY = '(min-width: 1080px) and (prefers-reduced-motion: no-prefer
  * Geen scroll-jacking: de pagina scrollt gewoon door.
  */
 export function SignatureMotion({ values, codes }: { values: Array<number | null>; codes: string[] }) {
-  useIsoLayoutEffect(() => {
+  useGsapEffect(({ gsap, ScrollTrigger }) => {
     const section = document.querySelector<HTMLElement>('[data-signature]')
     if (!section) return
-    const { gsap, ScrollTrigger } = ensureGsap()
     const mm = gsap.matchMedia()
 
     mm.add(STICKY_QUERY, () => {

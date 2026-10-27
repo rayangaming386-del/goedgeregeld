@@ -1,6 +1,6 @@
 'use client'
 
-import { ensureGsap, QUERIES, useIsoLayoutEffect } from '@/components/motion/gsap-client'
+import { QUERIES, useGsapEffect } from '@/components/motion/gsap-client'
 
 /**
  * Scrollgedrag van de hero (de intro zelf draait in CSS):
@@ -8,10 +8,9 @@ import { ensureGsap, QUERIES, useIsoLayoutEffect } from '@/components/motion/gsa
  * Werkt op wrappers, zodat het niet botst met de CSS-intro.
  */
 export function HeroMotion() {
-  useIsoLayoutEffect(() => {
+  useGsapEffect(({ gsap }) => {
     const hero = document.querySelector<HTMLElement>('[data-hero]')
     if (!hero) return
-    const { gsap } = ensureGsap()
     const mm = gsap.matchMedia()
     mm.add({ isDesktop: QUERIES.desktop, motionOk: QUERIES.motionOk }, (ctx) => {
       const { isDesktop, motionOk } = ctx.conditions as { isDesktop: boolean; motionOk: boolean }

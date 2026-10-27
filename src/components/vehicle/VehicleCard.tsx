@@ -11,9 +11,11 @@ type Props = {
   index: number
   headingLevel?: 'h2' | 'h3'
   sizes?: string
+  /** Beeld direct laden (bovenaan de pagina, mogelijk het grootste element). */
+  priority?: boolean
 }
 
-export function VehicleCard({ vehicle, index, headingLevel = 'h3', sizes }: Props) {
+export function VehicleCard({ vehicle, index, headingLevel = 'h3', sizes, priority = false }: Props) {
   const Heading = headingLevel
   const href = `/wagenpark/${vehicle.slug}`
   return (
@@ -23,6 +25,7 @@ export function VehicleCard({ vehicle, index, headingLevel = 'h3', sizes }: Prop
           <Picture
             image={vehicle.image}
             sizes={sizes ?? '(min-width: 1280px) 24vw, (min-width: 720px) 46vw, 100vw'}
+            priority={priority}
             className={styles.picture}
             imgClassName={styles.img}
           />

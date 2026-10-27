@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { startTransition, useActionState, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useActionState, useEffect, useId, useMemo, useRef, useState, useTransition } from 'react'
 import { submitRequest, type RequestState } from '@/app/(site)/aanvragen/actions'
 import { Alert, ArrowRight, Calendar, Check, Info, WhatsApp } from '@/components/icons'
 import { calculateQuote, type PricingRules, type PromotionRule, type PublicDayPrice, type PublicDeposit, type RateCard } from '@/domain/pricing'
@@ -42,6 +42,9 @@ const EMPTY: RequestInput = {
   message: '',
 }
 
+const CONNECTION_ERROR =
+  'De verbinding met de server is mislukt. Je aanvraag is niet verstuurd en er is niets opgeslagen. Probeer het opnieuw of stuur je aanvraag via WhatsApp.'
+
 const FIELD_ORDER: RequestField[] = ['vehicle', 'startDate', 'startTime', 'endDate', 'endTime', 'name', 'phone', 'email', 'message']
 
 const FIELD_LABELS: Record<RequestField, string> = {
@@ -69,7 +72,14 @@ export function RequestForm({ vehicles, defaultSlug, whatsapp, rules, privacyPub
   const [clientErrors, setClientErrors] = useState<FieldErrors | null>(null)
   const [attempted, setAttempted] = useState(false)
   const [startedAt, setStartedAt] = useState<number | null>(null)
-  const [state, dispatch, pending] = useActionState<RequestState, FormData>(submitRequest, { status: 'idle' })
+  // Zonder JavaScript post het formulier rechtstreeks naar de Server Action (formAction).
+  const [serverState, formAction, serverPending] = useActionState<RequestState, FormData>(submitRequest, { status: 'idle' })
+  // Met JavaScript roepen we de actie zelf aan, zodat een verbroken verbinding
+  // een nette melding geeft en de ingevulde gegevens blijven staan.
+  const [clientState, setClientState] = useState<RequestState | null>(null)
+  const [clientPending, startSubmit] = useTransition()
+  const state = clientState ?? serverState
+  const pending = serverPending || clientPending
   const [dismissed, setDismissed] = useState(false)
   const [today, setToday] = useState('')
 
@@ -131,7 +141,14 @@ export function RequestForm({ vehicles, defaultSlug, whatsapp, rules, privacyPub
     setClientErrors(null)
     const fd = new FormData(e.currentTarget)
     if (startedAt) fd.set('startedAt', String(startedAt))
-    startTransition(() => dispatch(fd))
+    startSubmit(async () => {
+      try {
+        const result = await submitRequest(state, fd)
+        setClientState(result)
+      } catch {
+        setClientState({ status: 'error', message: CONNECTION_ERROR })
+      }
+    })
   }
 
   // Na een serverantwoord de focus verplaatsen naar het resultaat.
@@ -149,6 +166,7 @@ export function RequestForm({ vehicles, defaultSlug, whatsapp, rules, privacyPub
     setAttempted(false)
     setClientErrors(null)
     setDismissed(true)
+    setClientState(null)
     setStartedAt(null)
     requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>('input, select')?.focus())
   }
@@ -216,7 +234,7 @@ export function RequestForm({ vehicles, defaultSlug, whatsapp, rules, privacyPub
     ) : null
 
   return (
-    <form ref={formRef} className={styles.form} action={dispatch} onSubmit={onSubmit} noValidate aria-describedby={id('intro')}>
+    <form ref={formRef} className={styles.form} action={formAction} onSubmit={onSubmit} noValidate aria-describedby={id('intro')}>
       <p id={id('intro')} className="visually-hidden">
         Beschikbaarheidsaanvraag. Velden met een sterretje zijn verplicht.
       </p>

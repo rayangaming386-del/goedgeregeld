@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { Pause, Play } from '@/components/icons'
-import { ensureGsap, QUERIES, useIsoLayoutEffect } from '@/components/motion/gsap-client'
+import { QUERIES, useGsapEffect } from '@/components/motion/gsap-client'
 import styles from './Marquee.module.css'
 
 function Hex() {
@@ -25,11 +25,10 @@ export function Marquee({ items }: { items: string[] }) {
   const [paused, setPaused] = useState(false)
   const pausedRef = useRef(false)
 
-  useIsoLayoutEffect(() => {
+  useGsapEffect(({ gsap, ScrollTrigger }) => {
     const root = rootRef.current
     const track = trackRef.current
     if (!root || !track) return
-    const { gsap, ScrollTrigger } = ensureGsap()
     const mm = gsap.matchMedia()
     mm.add(QUERIES.motionOk, () => {
       root.dataset.animated = 'true'
