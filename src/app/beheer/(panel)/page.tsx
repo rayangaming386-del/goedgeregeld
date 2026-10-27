@@ -10,9 +10,20 @@ import { dashboardData } from '@/server/admin/queries'
 import { requireUser } from '@/server/auth/session'
 import { getSetting } from '@/server/content/settings'
 import { mailConfigured } from '@/server/mail'
+import { storageKind } from '@/server/storage'
 import { VEHICLE_STATUS_LABELS } from './wagenpark/labels'
 
 export const metadata: Metadata = { title: 'Dashboard' }
+
+const STORAGE_LABELS = { local: 'Lokale schijf', s3: 'Object storage (S3)', database: 'Database' } as const
+
+function storageLabel(): string {
+  try {
+    return STORAGE_LABELS[storageKind()]
+  } catch {
+    return 'Onjuist ingesteld (MEDIA_STORAGE)'
+  }
+}
 
 export default async function DashboardPage() {
   const user = await requireUser()
@@ -250,7 +261,7 @@ export default async function DashboardPage() {
             <li>
               <span>Media-opslag</span>
               <span className="adm-badge tone-info">
-                <Info size={14} /> {process.env.MEDIA_STORAGE === 's3' ? 'Object storage (S3)' : 'Lokale schijf'}
+                <Info size={14} /> {storageLabel()}
               </span>
             </li>
           </ul>

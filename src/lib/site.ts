@@ -10,9 +10,14 @@ export function siteUrl(): string | null {
   }
 }
 
-/** Basis voor metadata; valt terug op localhost wanneer er nog geen domein is. */
+/**
+ * Basis voor metadata (o.a. deelafbeeldingen). Zonder domein: het Vercel-adres
+ * van deze deployment, zodat een gedeelde link een voorbeeld toont; anders localhost.
+ */
 export function metadataBase(): URL {
-  return new URL(siteUrl() ?? `http://localhost:${process.env.PORT ?? 3000}`)
+  const vercel =
+    process.env.VERCEL_ENV === 'production' ? process.env.VERCEL_PROJECT_PRODUCTION_URL : process.env.VERCEL_BRANCH_URL || process.env.VERCEL_URL
+  return new URL(siteUrl() ?? (vercel ? `https://${vercel}` : `http://localhost:${process.env.PORT ?? 3000}`))
 }
 
 export function absoluteUrl(path: string): string | null {

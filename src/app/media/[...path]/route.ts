@@ -2,9 +2,9 @@ import { contentTypeForVariant, VARIANT_CACHE_CONTROL } from '@/server/media/pip
 import { getStorage, PUBLIC_PREFIX } from '@/server/storage'
 
 /**
- * Serveert webvarianten uit lokale opslag. Originelen (originals/) zijn hier
- * bewust niet bereikbaar. Bij S3-opslag verwijzen de URL’s rechtstreeks naar
- * de bucket en wordt deze route niet gebruikt.
+ * Serveert webvarianten uit lokale opslag of de database. Originelen
+ * (originals/) zijn hier bewust niet bereikbaar. Bij S3-opslag verwijzen de
+ * URL’s rechtstreeks naar de bucket en wordt deze route niet gebruikt.
  */
 export async function GET(_req: Request, ctx: { params: Promise<{ path: string[] }> }) {
   const { path } = await ctx.params

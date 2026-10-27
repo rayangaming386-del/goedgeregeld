@@ -15,6 +15,13 @@
       "when": 1793033671668,
       "tag": "0001_planning-constraints",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793114566584,
+      "tag": "0002_media-objects",
+      "breakpoints": true
     }
   ]
 }

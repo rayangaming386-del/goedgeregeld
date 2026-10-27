@@ -6,15 +6,23 @@
  *    in een aparte map en worden nooit publiek geserveerd.
  *  - `s3`: S3-compatibele object storage (AWS S3, Cloudflare R2, MinIO).
  *    Klaar voor aansluiting; vereist de S3_*-variabelen uit .env.example.
+ *  - `database`: bestanden in PostgreSQL (tabel media_objects), geserveerd
+ *    via /media/… met CDN-caching. Standaard op Vercel, waar geen blijvende
+ *    schijf is; ruim voldoende voor een wagenpark van deze omvang.
  *
  * Sleutels: `originals/<id>.<ext>` (privé) en `variants/<id>/<breedte>.<formaat>` (publiek).
  */
 import { mkdir, readFile, rm, rmdir, writeFile } from 'node:fs/promises'
 import { dirname, join, normalize, relative, resolve, sep } from 'node:path'
 import { AwsClient } from 'aws4fetch'
+import { eq } from 'drizzle-orm'
+import { getDb } from '../db/client'
+import { mediaObjects } from '../db/schema'
+
+export type StorageKind = 'local' | 's3' | 'database'
 
 export interface StorageDriver {
-  readonly kind: 'local' | 's3'
+  readonly kind: StorageKind
   put(key: string, body: Buffer, contentType: string, cacheControl?: string): Promise<void>
   get(key: string): Promise<Buffer | null>
   delete(key: string): Promise<void>
@@ -140,11 +148,48 @@ class S3Storage implements StorageDriver {
   }
 }
 
+export class DatabaseStorage implements StorageDriver {
+  readonly kind = 'database' as const
+
+  async put(key: string, body: Buffer, contentType: string): Promise<void> {
+    assertSafeKey(key)
+    const values = { contentType, body, bytes: body.byteLength }
+    await getDb()
+      .insert(mediaObjects)
+      .values({ key, ...values })
+      .onConflictDoUpdate({ target: mediaObjects.key, set: { ...values, createdAt: new Date() } })
+  }
+
+  async get(key: string): Promise<Buffer | null> {
+    assertSafeKey(key)
+    const [row] = await getDb().select({ body: mediaObjects.body }).from(mediaObjects).where(eq(mediaObjects.key, key))
+    return row?.body ?? null
+  }
+
+  async delete(key: string): Promise<void> {
+    assertSafeKey(key)
+    await getDb().delete(mediaObjects).where(eq(mediaObjects.key, key))
+  }
+
+  publicUrl(key: string): string {
+    return `/media/${key.slice(PUBLIC_PREFIX.length)}`
+  }
+}
+
+/** De gekozen opslag. Zonder MEDIA_STORAGE: de database op Vercel, anders de lokale schijf. */
+export function storageKind(): StorageKind {
+  const kind = process.env.MEDIA_STORAGE?.trim()
+  if (!kind) return process.env.VERCEL ? 'database' : 'local'
+  if (kind === 'local' || kind === 's3' || kind === 'database') return kind
+  throw new Error(`Onbekende MEDIA_STORAGE "${kind}". Kies local, s3 of database.`)
+}
+
 let driver: StorageDriver | null = null
 
 export function getStorage(): StorageDriver {
   if (driver) return driver
-  const kind = process.env.MEDIA_STORAGE ?? 'local'
-  driver = kind === 's3' ? new S3Storage() : new LocalStorage(process.env.MEDIA_LOCAL_DIR ?? './storage')
+  const kind = storageKind()
+  driver =
+    kind === 's3' ? new S3Storage() : kind === 'database' ? new DatabaseStorage() : new LocalStorage(process.env.MEDIA_LOCAL_DIR ?? './storage')
   return driver
 }

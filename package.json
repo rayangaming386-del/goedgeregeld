@@ -19,11 +19,14 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
     "db:setup": "pnpm db:migrate && pnpm db:seed",
+    "deploy:prepare": "tsx scripts/prepare-deploy.ts",
+    "vercel-build": "pnpm deploy:prepare && next build",
     "user:create": "tsx scripts/create-user.ts",
     "user:reset-password": "tsx scripts/reset-password.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "2.2.2",
+    "@vercel/functions": "3.9.11",
     "aws4fetch": "1.0.20",
     "drizzle-orm": "0.45.4",
     "gsap": "3.15.0",

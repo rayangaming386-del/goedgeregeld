@@ -54,7 +54,8 @@ test('inlogpagina en beheer hebben geen toegankelijkheidsfouten', async ({ page 
   const paths = [...ADMIN]
   // Detailpagina’s van de eerste aanvraag en de eerste auto, met alle tabbladen.
   await page.goto('/beheer/aanvragen?status=alle')
-  const firstRequest = await page.locator('table a[href^="/beheer/aanvragen/"]').first().getAttribute('href')
+  // Een verse installatie heeft nog geen aanvragen; dan valt deze pagina af.
+  const firstRequest = await page.evaluate(() => document.querySelector('table a[href^="/beheer/aanvragen/"]')?.getAttribute('href') ?? null)
   if (firstRequest) paths.push(firstRequest)
   await page.goto('/beheer/wagenpark')
   const firstVehicle = await page.evaluate(() =>

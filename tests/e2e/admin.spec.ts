@@ -1,5 +1,7 @@
+import { statSync } from 'node:fs'
 import path from 'node:path'
 import { expect, test, type Page } from '@playwright/test'
+import sharp from 'sharp'
 import { login, watchErrors } from './helpers'
 
 // Beheertests muteren data; alleen op desktop, één keer per run.
@@ -155,6 +157,15 @@ test.describe('wagenpark', () => {
     await altForm.locator('textarea, input[name="alt"]').first().fill('Testfoto van de testauto in de showroom.')
     await altForm.getByRole('button', { name: 'Opslaan' }).click()
     await expectMessage(page, 'Foto 1 bewerken', /opgeslagen/i)
+
+    // Met een lagere limiet per verzoek (Vercel: 4,5 MB) verkleint de browser een grote foto eerst.
+    if (await page.locator('#upload-limiet').isVisible()) {
+      const big = test.info().outputPath('groot.jpg')
+      await sharp(PHOTOS[0]).resize({ width: 5200 }).sharpen({ sigma: 2 }).jpeg({ quality: 97, chromaSubsampling: '4:4:4' }).toFile(big)
+      expect(statSync(big).size).toBeGreaterThan(4.5 * 1024 * 1024)
+      await page.setInputFiles('#upload', big)
+      await expect(page.locator('.adm-upload-list .tone-ok')).toHaveCount(1, { timeout: 60_000 })
+    }
 
     // Prijs wijzigen (alleen eigenaar).
     await page.goto(`${base}?tab=prijzen`)

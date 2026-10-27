@@ -1,3 +1,4 @@
+import { attachDatabasePool } from '@vercel/functions/db-connections'
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
 import * as schema from './schema'
@@ -13,15 +14,19 @@ function create(): Cached {
   if (!connectionString) {
     throw new Error('DATABASE_URL ontbreekt. Zie .env.example.')
   }
+  const onVercel = Boolean(process.env.VERCEL)
   const pool = new Pool({
     connectionString,
     max: Number(process.env.DATABASE_POOL_MAX ?? 10),
-    idleTimeoutMillis: 30_000,
+    // Op Vercel blijft een functie actief tot de idle verbindingen dicht zijn; houd dat kort.
+    idleTimeoutMillis: onVercel ? 5_000 : 30_000,
   })
   // Een verbroken idle-verbinding mag het proces niet laten crashen.
   pool.on('error', (err) => {
     console.error('[db] fout op idle-verbinding:', err.message)
   })
+  // Sluit idle verbindingen voordat Vercel een instantie pauzeert (anders blijven ze open hangen).
+  if (onVercel) attachDatabasePool(pool)
   return { pool, db: drizzle(pool, { schema }) }
 }
 

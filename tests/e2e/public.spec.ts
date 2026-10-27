@@ -150,6 +150,27 @@ test.describe('aanvraagformulier', () => {
     await expect(page.getByRole('link', { name: 'Stuur je aanvraag via WhatsApp' })).toHaveAttribute('href', WHATSAPP)
     await expect(page.getByText('Aanvraag ontvangen')).toHaveCount(0)
   })
+
+  test('wat al is ingevuld voordat de pagina interactief is, blijft staan', async ({ page }) => {
+    // Trage verbinding nagebootst: de scripts (niet de CSS) komen pas binnen nadat er al is ingevuld.
+    let release = () => {}
+    const scripts = new Promise<void>((resolve) => (release = resolve))
+    await page.route(/\/_next\/static\/chunks\/.+\.js(\?.*)?$/, async (route) => {
+      await scripts
+      await route.continue()
+    })
+    const start = new Date(Date.now() + 40 * 86_400_000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Amsterdam' })
+    await page.goto('/aanvragen?auto=audi-sq5', { waitUntil: 'commit' })
+    const form = page.locator('form').filter({ has: page.locator('input[name="name"]') })
+    await form.locator('input[name="startDate"]').fill(start)
+    await form.locator('input[name="name"]').fill('Vroege invuller')
+    release()
+    await page.waitForLoadState('networkidle')
+    // Na het laden: een nieuwe invoer laat React opnieuw weergeven.
+    await form.locator('input[name="phone"]').fill('0612345678')
+    await expect(form.locator('input[name="startDate"]')).toHaveValue(start)
+    await expect(form.locator('input[name="name"]')).toHaveValue('Vroege invuller')
+  })
 })
 
 test.describe('mobiel menu', () => {

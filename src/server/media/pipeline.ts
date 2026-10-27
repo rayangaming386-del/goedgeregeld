@@ -8,6 +8,14 @@ import sharp, { type Metadata } from 'sharp'
 import type { MediaVariant } from '../db/schema'
 
 export const MAX_UPLOAD_BYTES = 12 * 1024 * 1024
+
+/**
+ * Grootste bestand dat in één verzoek past. Vercel weigert verzoeken boven
+ * 4,5 MB; grotere foto’s verkleint het beheer dan eerst in de browser.
+ */
+export function uploadLimitBytes(): number {
+  return process.env.VERCEL ? 4 * 1024 * 1024 : MAX_UPLOAD_BYTES
+}
 export const MIN_SHORT_SIDE = 400
 export const MAX_PIXELS = 60_000_000
 export const VARIANT_WIDTHS = [480, 768, 1080, 1440, 1920] as const
@@ -125,7 +133,10 @@ export async function processImage(buffer: Buffer, keyPrefix: string): Promise<P
   }
 }
 
-export const VARIANT_CACHE_CONTROL = 'public, max-age=31536000, immutable'
+// Elke versie heeft een eigen URL. s-maxage laat ook een CDN (bijv. Vercel)
+// de foto bewaren, zodat de database of bucket er zelden voor wordt gevraagd;
+// korter dan in de browser, zodat een verwijderde foto daar binnen een dag weg is.
+export const VARIANT_CACHE_CONTROL = 'public, max-age=31536000, s-maxage=86400, immutable'
 
 export function contentTypeForVariant(format: MediaVariant['format']): string {
   return format === 'avif' ? 'image/avif' : format === 'webp' ? 'image/webp' : 'image/jpeg'

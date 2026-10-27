@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { ActionForm, FieldError, FormMessage, SubmitButton } from '@/components/admin/ActionForm'
 import { INITIAL_STATE } from '@/components/admin/action-state'
 import { ConfirmSubmit } from '@/components/admin/ConfirmSubmit'
+import { fitUpload, formatMb } from '@/components/admin/fit-upload'
 import { Alert, Check, Hexagon } from '@/components/icons'
 import { photoCommandAction, reorderPhotosAction, replacePhotoAction, updatePhotoAction, uploadPhotoAction } from '../actions'
 
@@ -28,7 +29,15 @@ const MAX_BYTES = 12 * 1024 * 1024
 
 type UploadItem = { key: string; name: string; preview: string; status: 'wacht' | 'bezig' | 'klaar' | 'fout'; message?: string }
 
-export function PhotoManager({ vehicleId, photos, canEdit }: { vehicleId: string; photos: AdminPhoto[]; canEdit: boolean }) {
+type Props = {
+  vehicleId: string
+  photos: AdminPhoto[]
+  canEdit: boolean
+  /** Grootste bestand per verzoek; grotere foto’s worden eerst in de browser verkleind. */
+  uploadLimit: number
+}
+
+export function PhotoManager({ vehicleId, photos, canEdit, uploadLimit }: Props) {
   const router = useRouter()
   const [uploads, setUploads] = useState<UploadItem[]>([])
   const [busy, setBusy] = useState(false)
@@ -42,6 +51,9 @@ export function PhotoManager({ vehicleId, photos, canEdit }: { vehicleId: string
   useEffect(() => setOrder(photos.map((p) => p.id)), [photos])
   // Voorvertoningen pas vrijgeven bij een nieuwe selectie of bij het verlaten van de pagina.
   useEffect(() => () => previewUrls.current.forEach((u) => URL.revokeObjectURL(u)), [])
+
+  const shrinks = uploadLimit < MAX_BYTES
+  const tooLarge = `Groter dan ${formatMb(uploadLimit)} MB en niet te verkleinen; exporteer als JPEG en probeer opnieuw`
 
   const byId = new Map(photos.map((p) => [p.id, p]))
   const ordered = order.map((id) => byId.get(id)).filter((p): p is AdminPhoto => Boolean(p))
@@ -64,9 +76,16 @@ export function PhotoManager({ vehicleId, photos, canEdit }: { vehicleId: string
     for (let i = 0; i < list.length; i++) {
       if (items[i]!.status === 'fout') continue
       setUploads((prev) => prev.map((u, j) => (j === i ? { ...u, status: 'bezig' } : u)))
+      let file: File
+      try {
+        file = await fitUpload(list[i]!, uploadLimit)
+      } catch {
+        setUploads((prev) => prev.map((u, j) => (j === i ? { ...u, status: 'fout', message: tooLarge } : u)))
+        continue
+      }
       const fd = new FormData()
       fd.set('vehicleId', vehicleId)
-      fd.set('file', list[i]!)
+      fd.set('file', file)
       try {
         const res = await uploadPhotoAction(INITIAL_STATE, fd)
         setUploads((prev) => prev.map((u, j) => (j === i ? { ...u, status: res.ok ? 'klaar' : 'fout', message: res.ok ? undefined : res.message } : u)))
@@ -107,6 +126,12 @@ export function PhotoManager({ vehicleId, photos, canEdit }: { vehicleId: string
             JPEG, PNG, WebP of AVIF, maximaal 12 MB per bestand en minimaal 400 pixels aan de korte kant. Het origineel wordt bewaard; de website
             gebruikt automatisch geoptimaliseerde versies. Watermerken en tekst in beeld blijven zoals ze zijn.
           </p>
+          {shrinks ? (
+            <p className="adm-small" id="upload-limiet">
+              Deze hosting neemt maximaal {formatMb(uploadLimit)} MB per keer aan. Grotere foto’s verkleint je browser eerst (JPEG, hooguit 4000 pixels
+              aan de lange kant); die versie wordt dan als origineel bewaard. De website toont foto’s op maximaal 1920 pixels breed.
+            </p>
+          ) : null}
           <div className="field">
             <label className="field__label" htmlFor="upload">
               Kies een of meer foto’s
@@ -152,7 +177,7 @@ export function PhotoManager({ vehicleId, photos, canEdit }: { vehicleId: string
               onDragOver={(e) => canEdit && e.preventDefault()}
               onDrop={() => onDrop(p.id)}
             >
-              <PhotoCard photo={p} index={i} total={ordered.length} canEdit={canEdit} />
+              <PhotoCard photo={p} index={i} total={ordered.length} canEdit={canEdit} uploadLimit={uploadLimit} />
             </li>
           ))}
         </ol>
@@ -161,7 +186,19 @@ export function PhotoManager({ vehicleId, photos, canEdit }: { vehicleId: string
   )
 }
 
-function PhotoCard({ photo, index, total, canEdit }: { photo: AdminPhoto; index: number; total: number; canEdit: boolean }) {
+function PhotoCard({
+  photo,
+  index,
+  total,
+  canEdit,
+  uploadLimit,
+}: {
+  photo: AdminPhoto
+  index: number
+  total: number
+  canEdit: boolean
+  uploadLimit: number
+}) {
   const [focal, setFocal] = useState({ x: photo.focalX, y: photo.focalY })
   useEffect(() => setFocal({ x: photo.focalX, y: photo.focalY }), [photo.focalX, photo.focalY])
 
@@ -284,7 +321,7 @@ function PhotoCard({ photo, index, total, canEdit }: { photo: AdminPhoto; index:
                 <label className="field__label" htmlFor={`replace-${photo.id}`}>
                   Foto vervangen
                 </label>
-                <input className="input" type="file" id={`replace-${photo.id}`} name="file" accept={ACCEPT} />
+                <ReplaceInput id={`replace-${photo.id}`} limit={uploadLimit} />
               </div>
               <div className="adm-form-actions">
                 <SubmitButton variant="ghost" pendingText="Bezig met verwerken…">
@@ -297,5 +334,48 @@ function PhotoCard({ photo, index, total, canEdit }: { photo: AdminPhoto; index:
         ) : null}
       </div>
     </div>
+  )
+}
+
+/** Bestandskeuze voor ‘Foto vervangen’: verkleint een te groot bestand vóór het verzenden. */
+function ReplaceInput({ id, limit }: { id: string; limit: number }) {
+  const [note, setNote] = useState('')
+  const onChange = async (input: HTMLInputElement) => {
+    const file = input.files?.[0]
+    setNote('')
+    if (!file) return
+    if (file.size > MAX_BYTES) {
+      input.value = ''
+      setNote('Het bestand is groter dan 12 MB.')
+      return
+    }
+    if (file.size <= limit) return
+    setNote('Bezig met verkleinen…')
+    try {
+      const small = await fitUpload(file, limit)
+      const list = new DataTransfer()
+      list.items.add(small)
+      input.files = list.files
+      setNote(`Verkleind tot ${formatMb(small.size)} MB voor het uploaden.`)
+    } catch {
+      input.value = ''
+      setNote(`Dit bestand is groter dan ${formatMb(limit)} MB en kon niet worden verkleind. Exporteer het als JPEG en probeer opnieuw.`)
+    }
+  }
+  return (
+    <>
+      <input
+        className="input"
+        type="file"
+        id={id}
+        name="file"
+        accept={ACCEPT}
+        aria-describedby={note ? `${id}-melding` : undefined}
+        onChange={(e) => onChange(e.currentTarget)}
+      />
+      <p id={`${id}-melding`} className="adm-small" role="status">
+        {note}
+      </p>
+    </>
   )
 }

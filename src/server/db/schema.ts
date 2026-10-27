@@ -4,6 +4,7 @@ import {
   bigserial,
   boolean,
   check,
+  customType,
   index,
   integer,
   jsonb,
@@ -214,6 +215,20 @@ export const media = pgTable(
     check('media_focal_range', sql`${t.focalX} BETWEEN 0 AND 100 AND ${t.focalY} BETWEEN 0 AND 100`),
   ],
 )
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({ dataType: () => 'bytea' })
+
+/**
+ * Bestanden bij MEDIA_STORAGE=database (standaard op Vercel, waar geen
+ * blijvende schijf is). Zelfde sleutels als bij de andere opslag.
+ */
+export const mediaObjects = pgTable('media_objects', {
+  key: text('key').primaryKey(),
+  contentType: text('content_type').notNull(),
+  body: bytea('body').notNull(),
+  bytes: integer('bytes').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
 
 /* ───────────────────────────── Website-inhoud ───────────────────────────── */
 

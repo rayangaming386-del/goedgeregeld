@@ -12,6 +12,7 @@ import { centsToInput, formatTenths } from '@/lib/format'
 import { requireUser } from '@/server/auth/session'
 import { getDb } from '@/server/db/client'
 import { auditLog, media, revisions, users, vehicles, vehicleVerifications } from '@/server/db/schema'
+import { uploadLimitBytes } from '@/server/media/pipeline'
 import { getStorage } from '@/server/storage'
 import { VERIFICATION_FIELDS } from '@/server/vehicles/service'
 import {
@@ -475,7 +476,7 @@ export default async function VehicleEditPage({ params, searchParams }: PageProp
         )
       ) : null}
 
-      {tab === 'fotos' ? <PhotoManager vehicleId={v.id} photos={photos} canEdit={can(user.role, 'media:beheren')} /> : null}
+      {tab === 'fotos' ? <PhotoManager vehicleId={v.id} photos={photos} canEdit={can(user.role, 'media:beheren')} uploadLimit={uploadLimitBytes()} /> : null}
 
       {tab === 'seo' ? (
         <section className="adm-panel" style={{ maxWidth: '56rem' }}>

@@ -83,6 +83,25 @@ export function RequestForm({ vehicles, defaultSlug, whatsapp, rules, privacyPub
   const [dismissed, setDismissed] = useState(false)
   const [today, setToday] = useState('')
 
+  // Wat al is ingevuld voordat de pagina interactief was (trage verbinding,
+  // automatisch invullen door de browser), overnemen. Anders zet React het
+  // bij de eerstvolgende weergave terug naar de lege beginwaarde.
+  useEffect(() => {
+    const form = formRef.current
+    if (!form) return
+    const typed: Partial<RequestInput> = {}
+    for (const field of FIELD_ORDER) {
+      const el = form.elements.namedItem(field)
+      if (el && 'value' in el && String(el.value) !== values[field]) typed[field] = String(el.value)
+    }
+    if (Object.keys(typed).length === 0) return
+    setValues((prev) => ({ ...prev, ...typed }))
+    // Invullen kan pas na het begin van het laden van de pagina.
+    setStartedAt((t) => t ?? Math.round(performance.timeOrigin))
+    // Alleen bij de eerste weergave, met de beginwaarden.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     setToday(toLocalInputValues(new Date()).date)
   }, [])

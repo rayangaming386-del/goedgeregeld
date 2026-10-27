@@ -19,7 +19,7 @@ Zie ook:
 
 - **Next.js 16** (App Router, React 19, TypeScript), servercomponenten en Server Actions
 - **PostgreSQL 15+** met Drizzle ORM; overlapcontrole voor bevestigde reserveringen in de database zelf (`btree_gist`-exclusieconstraint) én per auto met een transactielock
-- **sharp** voor foto’s: controle op inhoud, EXIF-rotatie, metadata verwijderd, AVIF- en WebP-varianten in meerdere breedtes, aparte OG-afbeelding
+- **sharp** voor foto’s: controle op inhoud, EXIF-rotatie, metadata verwijderd, AVIF- en WebP-varianten in meerdere breedtes, aparte OG-afbeelding; opslag op schijf, in de database (Vercel) of in S3
 - **GSAP** (ScrollTrigger, SplitText) voor beweging, pas geladen ná de eerste weergave
 - Eigen sessies (gehashte tokens in de database, `HttpOnly`, `SameSite=Lax`, `__Host-`-cookie in productie) en **Argon2id**-wachtwoorden
 - Vitest (unit en integratie tegen een echte testdatabase), Playwright + axe-core (browser en toegankelijkheid)
@@ -75,6 +75,8 @@ verwijderen uit de omgeving).
 | `pnpm db:generate` | Nieuwe migratie maken na een schemawijziging |
 | `pnpm user:create` | Account aanmaken via de opdrachtregel |
 | `pnpm user:reset-password --email …` | Nieuw wachtwoord voor een bestaand account (bijv. als de eigenaar het kwijt is); beëindigt alle sessies |
+| `pnpm deploy:prepare` | Vóór een build bij een deployment: instellingen controleren, migraties, bij de eerste installatie de startinhoud en het eerste eigenaar-account (zie hieronder) |
+| `pnpm vercel-build` | Wat Vercel uitvoert (via `vercel.json`): `deploy:prepare` en daarna `next build` |
 
 ## Rollen
 
@@ -108,6 +110,60 @@ Live verbergt de website alles wat niet bevestigd is, en auto’s waarvan de
 fotorechten niet bevestigd zijn. De schakelaar verandert alleen wat de website
 toont; hij zet de website niet op een domein of bij een hostingpartij.
 
+## Op Vercel zetten
+
+De repository bevat een `vercel.json`. Vercel voert bij elke deployment eerst
+`pnpm deploy:prepare` uit (instellingen controleren, migraties, de eerste keer
+ook de startinhoud) en bouwt daarna de site. De serverfuncties draaien in
+Frankfurt (`fra1`), dicht bij de klanten en bij de database.
+
+Eenmalig instellen:
+
+1. **Database.** Vercel → het project → *Storage* → *Create Database* →
+   **Neon** (Postgres). Kies de regio *Frankfurt (eu-central-1)*, koppel de
+   database aan het project (in elk geval *Production*) en laat het
+   voorvoegsel voor de variabelen leeg. Vercel zet dan zelf `DATABASE_URL` en
+   `DATABASE_URL_UNPOOLED`.
+2. **Instellingen.** *Settings → Environment Variables*, voor *Production*:
+   - `APP_SECRET`: een willekeurige waarde van minstens 32 tekens
+     (bijvoorbeeld de uitvoer van `openssl rand -base64 48`);
+   - `SEED_OWNER_EMAIL` en `SEED_OWNER_PASSWORD` (minimaal 12 tekens) voor het
+     eerste eigenaar-account, en eventueel `SEED_OWNER_NAME`.
+3. **Deployen.** *Deployments → ⋯ → Redeploy*, of push naar `main`. De
+   eerste build laadt de vier auto’s, de foto’s en de standaardteksten (ongeveer
+   een minuut extra).
+4. **Inloggen** op `https://<project>.vercel.app/beheer` met dat e-mailadres
+   en wachtwoord. Je kiest direct een nieuw wachtwoord. Verwijder daarna
+   `SEED_OWNER_EMAIL` en `SEED_OWNER_PASSWORD` weer uit de instellingen.
+
+Goed om te weten:
+
+- **Ontbreekt er iets**, dan stopt de build met een uitleg in gewone taal in de
+  buildlog (bijvoorbeeld: geen database gekoppeld, `APP_SECRET` te kort).
+- **Latere deployments overschrijven niets.** De startinhoud wordt alleen
+  geladen in een database waar dat nog nooit is gebeurd en nog geen account
+  bestaat; het eigenaar-account alleen zolang er nog geen enkel account is.
+  Gelijktijdige builds wachten op elkaar (databaselock).
+- **Foto’s** staan op Vercel in de database (`MEDIA_STORAGE=database`, daar de
+  standaard) en gaan via het CDN van Vercel naar de bezoeker. De startinhoud is
+  ±21 MB. Originelen zijn niet publiek op te vragen.
+- **Uploads**: Vercel neemt maximaal 4,5 MB per verzoek aan. Het beheer
+  verkleint grotere foto’s daarom eerst in de browser (JPEG, hooguit 4000
+  pixels aan de lange kant; de website toont foto’s op maximaal 1920 pixels
+  breed). Dat staat ook bij het uploadveld.
+- **Conceptmodus**: de site staat op `noindex` tot de eigenaar hem in de
+  Publicatiecheck live zet. Een eigen domein voeg je toe onder *Settings →
+  Domains*; zet dan ook `SITE_URL` op dat domein. Zonder `SITE_URL` gebruiken
+  gedeelde links het `vercel.app`-adres voor de voorbeeldafbeelding.
+- **Preview-deployments** (andere branches) gebruiken de database die je aan
+  *Preview* koppelt en voeren daar ook migraties op uit. Koppel voor Preview
+  liever een aparte Neon-branch dan de productiedatabase.
+- **Back-ups**: Neon kan terugzetten naar een eerder moment (hoe ver terug hangt
+  af van het abonnement). Maak daarnaast periodiek een `pg_dump`; daarin
+  zitten op Vercel ook de foto’s.
+- **Wachtwoord van de enige eigenaar kwijt**: op een computer met de broncode
+  `DATABASE_URL="<adres uit Neon>" pnpm user:reset-password --email …`.
+
 ## In productie draaien
 
 - **Build leest de database.** Homepage, wagenpark en de autopagina’s worden
@@ -123,13 +179,17 @@ toont; hij zet de website niet op een domein of bij een hostingpartij.
   (bijvoorbeeld een CDN vóór nginx), zet dan `TRUSTED_PROXY_HOPS` op dat aantal.
 - **Foto’s**: met `MEDIA_STORAGE=local` op één server of VPS met een
   blijvende schijf (zet `MEDIA_LOCAL_DIR` buiten de deploymap en maak er
-  back-ups van). Voor serverless hosting is S3-compatibele opslag nodig
+  back-ups van). Zonder blijvende schijf (serverless, zoals Vercel):
+  `MEDIA_STORAGE=database` (foto’s in PostgreSQL) of S3-compatibele opslag
   (`MEDIA_STORAGE=s3`, klaar voor aansluiting, nog niet tegen een echte bucket
   getest). Originelen zijn nooit publiek.
 - **Uploadgrootte**: foto’s gaan per bestand (max. 12 MB) via een Server
-  Action. Sommige platforms begrenzen request bodies lager (bijvoorbeeld 4,5 MB
-  bij serverless functies op Vercel); kies dan een VPS of verklein foto’s vóór
-  het uploaden.
+  Action. Op Vercel (4,5 MB per verzoek) verkleint het beheer grotere foto’s
+  eerst in de browser. Begrenst een andere proxy de verzoeken (bijvoorbeeld
+  nginx `client_max_body_size`), zet die dan op minstens 13 MB.
+- **Deployment-voorbereiding**: draai vóór elke `pnpm build` op een nieuwe
+  versie `pnpm deploy:prepare` (migraties; bij een lege database ook de
+  startinhoud). Op Vercel gebeurt dat automatisch.
 - **E-mailmelding** bij een nieuwe aanvraag via Resend (optioneel, zie
   `.env.example`). Zonder melding staan aanvragen alleen in het beheer.
 - **Back-ups**: maak dagelijks een back-up van de database (`pg_dump`) en van
