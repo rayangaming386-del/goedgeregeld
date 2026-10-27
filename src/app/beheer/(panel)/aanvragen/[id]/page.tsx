@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { AdminLink as Link } from '@/components/admin/AdminLink'
 import { notFound } from 'next/navigation'
 import { ActionForm, FieldError, FormMessage, SubmitButton } from '@/components/admin/ActionForm'
 import { PlanningBadge, StatusBadge } from '@/components/admin/Badges'

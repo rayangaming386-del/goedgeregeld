@@ -3,6 +3,15 @@ import { brokenImages, horizontalOverflow, watchErrors } from './helpers'
 
 const VEHICLES = ['audi-rs3-sportback', 'audi-rs-q3', 'audi-sq5', 'audi-sq8']
 const WHATSAPP = /^https:\/\/wa\.me\/31616161623\?text=/
+const WHATSAPP_ANY = /^https:\/\/wa\.me\/31616161623(\?text=\S+)?$/
+
+/** Alle WhatsApp-links gaan naar het juiste nummer; minstens één met een ingevuld bericht. */
+async function checkWhatsApp(page: import('@playwright/test').Page) {
+  const hrefs = await page.locator('a[href*="wa.me"]').evaluateAll((as) => as.map((a) => a.getAttribute('href') ?? ''))
+  expect(hrefs.length).toBeGreaterThan(0)
+  for (const href of hrefs) expect(href).toMatch(WHATSAPP_ANY)
+  expect(hrefs.some((h) => WHATSAPP.test(h))).toBe(true)
+}
 
 test.describe('website', () => {
   test('homepage laadt zonder fouten en toont alle vier de auto’s', async ({ page }) => {
@@ -10,8 +19,7 @@ test.describe('website', () => {
     await page.goto('/')
     await expect(page.locator('h1')).toContainText('Sportieve Audi’s')
     for (const slug of VEHICLES) await expect(page.locator(`a[href="/wagenpark/${slug}"]`).first()).toBeAttached()
-    const wa = await page.locator('a[href*="wa.me"]').first().getAttribute('href')
-    expect(wa).toMatch(WHATSAPP)
+    await checkWhatsApp(page)
     expect(await brokenImages(page)).toEqual([])
     expect(errors).toEqual([])
   })
@@ -23,7 +31,7 @@ test.describe('website', () => {
       expect(res?.status()).toBe(200)
       await expect(page.locator('h1')).toBeVisible()
       await expect(page.getByRole('region', { name: /Foto’s van de/ })).toBeVisible()
-      await expect(page.locator('a[href*="wa.me"]').first()).toHaveAttribute('href', WHATSAPP)
+      await checkWhatsApp(page)
       expect(await brokenImages(page)).toEqual([])
     }
     expect(errors).toEqual([])
@@ -51,7 +59,7 @@ test.describe('website', () => {
   test('terugknop brengt je terug naar de vorige pagina', async ({ page }) => {
     await page.goto('/')
     await page.goto('/wagenpark')
-    await page.locator('a[href="/wagenpark/audi-sq5"]').first().click()
+    await page.locator('main a[href="/wagenpark/audi-sq5"]').first().click()
     await expect(page).toHaveURL(/\/wagenpark\/audi-sq5$/)
     await page.goBack()
     await expect(page).toHaveURL(/\/wagenpark$/)
@@ -135,7 +143,10 @@ test.describe('aanvraagformulier', () => {
     await form.locator('input[name="phone"]').fill('0612345678')
     await page.waitForTimeout(3000)
     await form.getByRole('button', { name: 'Verstuur aanvraag' }).click()
-    await expect(page.getByText('Niet verstuurd')).toBeVisible({ timeout: 15_000 })
+    await expect(page.getByText('Niet verstuurd', { exact: true })).toBeVisible({ timeout: 15_000 })
+    await expect(page.getByText(/De verbinding met de server is mislukt/)).toBeVisible()
+    // De ingevulde gegevens blijven staan.
+    await expect(form.locator('input[name="name"]')).toHaveValue('E2E Storing')
     await expect(page.getByRole('link', { name: 'Stuur je aanvraag via WhatsApp' })).toHaveAttribute('href', WHATSAPP)
     await expect(page.getByText('Aanvraag ontvangen')).toHaveCount(0)
   })

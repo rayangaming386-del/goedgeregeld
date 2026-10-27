@@ -1,6 +1,6 @@
 import { asc } from 'drizzle-orm'
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { AdminLink as Link } from '@/components/admin/AdminLink'
 import { EmptyState, NoAccess, PageHeader } from '@/components/admin/PageHeader'
 import { SETTING_LABELS, type SettingKey } from '@/domain/content'
 import { can } from '@/domain/permissions'

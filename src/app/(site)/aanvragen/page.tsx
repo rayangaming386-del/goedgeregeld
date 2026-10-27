@@ -28,7 +28,7 @@ export default async function RequestPage({ searchParams }: PageProps<'/aanvrage
       <div className={`container ${styles.grid}`}>
         <div className={styles.intro}>
           <p className="t-label eyebrow">Aanvragen</p>
-          <h1 className="t-h1">Beschikbaarheid aanvragen</h1>
+          <h1 className="t-h1">Wanneer wil je rijden?</h1>
           <p className="t-lead">Kies je auto en je gewenste periode. Je hoort persoonlijk of de auto vrij is.</p>
           <ol className={styles.steps}>
             {process.steps.map((s, i) => (

@@ -44,6 +44,8 @@ test('publieke pagina’s hebben geen toegankelijkheidsfouten', async ({ page })
 })
 
 test('inlogpagina en beheer hebben geen toegankelijkheidsfouten', async ({ page }) => {
+  // Ruim 25 pagina’s, elk met een volledige axe-analyse.
+  test.setTimeout(240_000)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   const found: string[] = []
   await page.goto('/beheer/login')

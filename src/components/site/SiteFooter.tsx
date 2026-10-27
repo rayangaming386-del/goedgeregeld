@@ -51,7 +51,7 @@ export function SiteFooter({ content, conceptMode, legalPages, vehicles }: Props
           <ul className={styles.contact}>
             <li>
               <a href={whatsappUrl(contact.whatsapp)} rel="noopener" target="_blank">
-                <WhatsApp size={18} /> <span>WhatsApp {contact.phoneDisplay}</span>
+                <WhatsApp size={18} /> <span>WhatsApp <span className="nowrap">{contact.phoneDisplay}</span></span>
               </a>
             </li>
             {contact.instagramUrl ? (

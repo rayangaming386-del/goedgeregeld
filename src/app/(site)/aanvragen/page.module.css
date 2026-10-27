@@ -11,6 +11,8 @@
 
 .intro {
   display: grid;
+  /* Kinderen nooit breder dan de kolom (anders schuift een lang woord onder het formulier). */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--s-5);
   align-content: start;
 }

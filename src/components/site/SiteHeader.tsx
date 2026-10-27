@@ -286,7 +286,7 @@ export function SiteHeader({ conceptMode, contact, vehicles }: Props) {
               <div className={styles.menuContact}>
                 <a href={whatsappUrl(contact.whatsapp)} className={styles.menuContactLink} rel="noopener" target="_blank">
                   <WhatsApp size={18} />
-                  <span>WhatsApp {contact.phoneDisplay}</span>
+                  <span>WhatsApp <span className="nowrap">{contact.phoneDisplay}</span></span>
                 </a>
                 {contact.instagramUrl ? (
                   <a href={contact.instagramUrl} className={styles.menuContactLink} rel="noopener" target="_blank">

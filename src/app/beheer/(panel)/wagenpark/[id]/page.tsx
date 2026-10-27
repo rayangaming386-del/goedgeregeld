@@ -1,6 +1,6 @@
 import { and, asc, desc, eq } from 'drizzle-orm'
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { AdminLink as Link } from '@/components/admin/AdminLink'
 import { notFound } from 'next/navigation'
 import { ActionForm, FieldError, FormMessage, SubmitButton } from '@/components/admin/ActionForm'
 import { ConfirmSubmit } from '@/components/admin/ConfirmSubmit'

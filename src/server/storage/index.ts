@@ -9,8 +9,8 @@
  *
  * Sleutels: `originals/<id>.<ext>` (privé) en `variants/<id>/<breedte>.<formaat>` (publiek).
  */
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
-import { dirname, join, normalize, resolve, sep } from 'node:path'
+import { mkdir, readFile, rm, rmdir, writeFile } from 'node:fs/promises'
+import { dirname, join, normalize, relative, resolve, sep } from 'node:path'
 import { AwsClient } from 'aws4fetch'
 
 export interface StorageDriver {
@@ -33,7 +33,7 @@ export function assertSafeKey(key: string): void {
   }
 }
 
-class LocalStorage implements StorageDriver {
+export class LocalStorage implements StorageDriver {
   readonly kind = 'local' as const
   private readonly root: string
 
@@ -65,7 +65,17 @@ class LocalStorage implements StorageDriver {
   }
 
   async delete(key: string): Promise<void> {
-    await rm(this.pathFor(key), { force: true })
+    const file = this.pathFor(key)
+    await rm(file, { force: true })
+    // Lege mappen (bijv. variants/<id>/<versie>) opruimen, maar nooit de
+    // hoofdmappen zelf (variants/, originals/).
+    for (let dir = dirname(file); relative(this.root, dir).includes(sep); dir = dirname(dir)) {
+      try {
+        await rmdir(dir)
+      } catch {
+        break // niet leeg of al verwijderd
+      }
+    }
   }
 
   publicUrl(key: string): string {

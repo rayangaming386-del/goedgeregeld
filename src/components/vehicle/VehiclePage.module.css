@@ -163,12 +163,9 @@
     top: calc(var(--header-h) + var(--s-5));
   }
 
+  /* Naast elkaar alleen als beide knoppen op één regel passen; anders onder elkaar. */
   .ctas {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .ctas :global(.btn) {
-    white-space: normal;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
   }
 }
 

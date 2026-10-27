@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { AdminLink as Link } from '@/components/admin/AdminLink'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { logout } from '@/app/beheer/auth-actions'

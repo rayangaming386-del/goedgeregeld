@@ -10,9 +10,13 @@ type Props = {
   hero: SiteContent['hero']
   image: PublicImage | null
   city: string
+  /** Aantal auto’s dat op de website staat. */
+  vehicleCount: number
+  /** Ingestelde contactkanalen, bijv. ['WhatsApp', 'Instagram']. */
+  channels: string[]
 }
 
-export function Hero({ hero, image, city }: Props) {
+export function Hero({ hero, image, city, vehicleCount, channels }: Props) {
   const plain = hero.headline.split(/\s+/).filter(Boolean)
   const accent = hero.headlineAccent.split(/\s+/).filter(Boolean)
   const words = [...plain.map((w) => ({ w, accent: false })), ...accent.map((w) => ({ w, accent: true }))]
@@ -79,10 +83,20 @@ export function Hero({ hero, image, city }: Props) {
             <dt className="t-label">Plaats</dt>
             <dd>{city}</dd>
           </div>
-          <div>
-            <dt className="t-label">Coördinaten</dt>
-            <dd className="t-mono">52,07° N · 4,30° O</dd>
-          </div>
+          {vehicleCount > 0 ? (
+            <div>
+              <dt className="t-label">Wagenpark</dt>
+              <dd>
+                {vehicleCount} {vehicleCount === 1 ? 'Audi' : 'Audi’s'}
+              </dd>
+            </div>
+          ) : null}
+          {channels.length ? (
+            <div>
+              <dt className="t-label">Contact</dt>
+              <dd>{channels.join(' en ')}</dd>
+            </div>
+          ) : null}
         </dl>
       </div>
 

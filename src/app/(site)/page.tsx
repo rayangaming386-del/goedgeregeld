@@ -61,7 +61,13 @@ export default async function HomePage() {
 
   return (
     <MotionScope>
-      <Hero hero={content.hero} image={pick(content.hero.mediaId)} city={content.contact.city} />
+      <Hero
+        hero={content.hero}
+        image={pick(content.hero.mediaId)}
+        city={content.contact.city}
+        vehicleCount={vehicles.length}
+        channels={[content.contact.whatsapp ? 'WhatsApp' : null, content.contact.instagramUrl ? 'Instagram' : null].filter((c): c is string => Boolean(c))}
+      />
       <Marquee items={content.marquee.items} />
       <FleetSection intro={content.fleetIntro} vehicles={vehicles} showIndicationNote={showIndicationNote} />
       <SignatureSection

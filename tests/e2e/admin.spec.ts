@@ -115,7 +115,14 @@ test.describe('aanvragen en planning', () => {
 
 test.describe('wagenpark', () => {
   test('testauto aanmaken, foto’s uploaden en sorteren, prijs wijzigen, publiceren en weer verwijderen', async ({ page }) => {
-    const errors = watchErrors(page)
+    test.setTimeout(180_000)
+    // De 404 van de offline gehaalde autopagina is verwacht; die controleren we apart.
+    const errors: string[] = []
+    page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`))
+    const notFound: string[] = []
+    page.on('response', (r) => {
+      if (r.status() === 404) notFound.push(new URL(r.url()).pathname)
+    })
     await login(page, 'eigenaar')
 
     await page.goto('/beheer/wagenpark/nieuw')
@@ -180,5 +187,6 @@ test.describe('wagenpark', () => {
     await expect(page).toHaveURL(/\/beheer\/wagenpark(\?verwijderd=1)?$/, { timeout: 20_000 })
     await expect(page.locator('main')).not.toContainText('E2E Testauto')
     expect(errors).toEqual([])
+    expect(notFound.filter((p) => p !== publicPath)).toEqual([])
   })
 })

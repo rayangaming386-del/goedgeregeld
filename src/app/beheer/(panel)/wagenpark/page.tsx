@@ -1,6 +1,6 @@
 import { asc, count, eq } from 'drizzle-orm'
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { AdminLink as Link } from '@/components/admin/AdminLink'
 import { ActionForm, FormMessage, SubmitButton } from '@/components/admin/ActionForm'
 import { NoAccess, PageHeader } from '@/components/admin/PageHeader'
 import { Check, Hexagon, Info } from '@/components/icons'

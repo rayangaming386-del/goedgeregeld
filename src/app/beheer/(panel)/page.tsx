@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { AdminLink as Link } from '@/components/admin/AdminLink'
 import { PlanningBadge } from '@/components/admin/Badges'
 import { EmptyState, PageHeader } from '@/components/admin/PageHeader'
 import { Alert, Check, Info } from '@/components/icons'

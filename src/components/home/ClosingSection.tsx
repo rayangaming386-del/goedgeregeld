@@ -44,7 +44,7 @@ export function ClosingSection({ closing, contact, image }: Props) {
               <dd>
                 <a href={whatsappUrl(contact.whatsapp)} rel="noopener" target="_blank">
                   <WhatsApp size={18} />
-                  {contact.phoneDisplay}
+                  <span className="nowrap">{contact.phoneDisplay}</span>
                 </a>
               </dd>
             </div>

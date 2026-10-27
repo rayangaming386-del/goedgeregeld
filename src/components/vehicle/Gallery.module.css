@@ -10,6 +10,8 @@
 
 .scroller {
   display: flex;
+  /* Expliciet: anders maakt max-height via aspect-ratio het vak smaller dan de kolom. */
+  width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;

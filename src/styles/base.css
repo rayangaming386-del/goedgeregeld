@@ -85,6 +85,12 @@ h2,
 h3,
 h4 {
   text-wrap: balance;
+  /* Lange Nederlandse samenstellingen afbreken waar de browser dat kan (lang="nl"). */
+  hyphens: auto;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 p {
@@ -205,6 +211,13 @@ a {
   font-stretch: var(--wdth-expanded);
   font-weight: 640;
   letter-spacing: var(--tracking-heading);
+}
+
+/* Grote koppen: liever (afgebroken) omlopen dan over andere inhoud heen lopen. */
+.t-display,
+.t-h1,
+.t-h2 {
+  overflow-wrap: anywhere;
 }
 
 .t-display {
