@@ -230,17 +230,21 @@ export async function savePageAction(_prev: ActionState, fd: FormData): Promise<
       approvedBy = owner.id
       approvedAt = new Date()
     } else {
+      // De privacyverklaring hoort bij het aanvraagformulier; zonder kan de site niet live blijven.
+      if (slug === 'privacy' && (await getSetting('publication')).mode === 'live') {
+        return fail('De website staat live. Zet de site eerst terug naar concept (Publicatiecheck) om de privacyverklaring offline te halen.')
+      }
       status = 'concept'
     }
-  } else if (current.status === 'gepubliceerd' && body !== current.body) {
-    // Een gepubliceerde tekst die verandert, moet opnieuw worden goedgekeurd.
-    if (!(await actionUser('paginas:goedkeuren'))) {
-      status = 'concept'
-      approvedBy = null
-      approvedAt = null
-    } else if (hasPlaceholder(body)) {
+  } else if (current.status === 'gepubliceerd' && (body !== current.body || title !== current.title)) {
+    // Een goedgekeurde juridische tekst wijzigt alleen de eigenaar (die keurt daarmee ook de nieuwe tekst goed).
+    const owner = await actionUser('paginas:goedkeuren')
+    if (!owner) return fail('Deze pagina is goedgekeurd en gepubliceerd. Alleen de eigenaar kan de tekst nog wijzigen.')
+    if (hasPlaceholder(body)) {
       return fail('Een gepubliceerde pagina mag geen [invulmarkeringen] bevatten.', { body: 'Er staan nog [invulmarkeringen] in de tekst.' })
     }
+    approvedBy = owner.id
+    approvedAt = new Date()
   }
   await recordRevision(db, { entityType: 'pagina', entityId: slug, snapshot: current, actorId: user.id, summary: 'Vorige versie' })
   await db.update(pages).set({ title, body, status, approvedBy, approvedAt, updatedBy: user.id, updatedAt: new Date() }).where(eq(pages.slug, slug))
@@ -252,6 +256,5 @@ export async function savePageAction(_prev: ActionState, fd: FormData): Promise<
     summary: `${title} ${intent === 'publiceren' ? 'goedgekeurd en gepubliceerd' : intent === 'depubliceren' ? 'offline gehaald' : 'bijgewerkt'}`,
   })
   refresh()
-  if (current.status === 'gepubliceerd' && status === 'concept' && !intent) return done('Opgeslagen. De pagina staat weer in concept tot de eigenaar de nieuwe tekst goedkeurt.')
   return done(intent === 'publiceren' ? 'Goedgekeurd en gepubliceerd.' : intent === 'depubliceren' ? 'Pagina offline gehaald.' : 'Opgeslagen.')
 }

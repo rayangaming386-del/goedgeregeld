@@ -23,7 +23,7 @@ type Props = {
  * Werkt zonder JavaScript via het action-attribuut.
  */
 export function ActionForm({ action, children, className, resetOnSuccess, id, ...rest }: Props) {
-  const [state, formAction] = useActionState(action, INITIAL_STATE)
+  const [state, formAction, isPending] = useActionState(action, INITIAL_STATE)
   const formRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
@@ -40,6 +40,8 @@ export function ActionForm({ action, children, className, resetOnSuccess, id, ..
         aria-label={rest['aria-label']}
         onSubmit={(e) => {
           e.preventDefault()
+          // Geen dubbele verzending terwijl de vorige nog loopt.
+          if (isPending) return
           const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLElement | null
           const fd = new FormData(e.currentTarget, submitter)
           startTransition(() => formAction(fd))
@@ -136,8 +138,9 @@ export function SubmitButton({
       name={name}
       value={value}
       className={`btn btn--sm ${variant === 'danger' ? 'btn--secondary adm-danger' : `btn--${variant}`} ${className}`}
-      disabled={pending}
-      aria-disabled={pending}
+      // Niet `disabled`: dan verliest de knop de toetsenbordfocus tijdens het opslaan.
+      aria-disabled={pending || undefined}
+      data-pending={pending || undefined}
     >
       {pending ? pendingText : children}
     </button>

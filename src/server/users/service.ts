@@ -36,6 +36,20 @@ async function lockedUser(tx: DbExecutor, userId: string): Promise<User> {
   return row
 }
 
+/**
+ * Transactie voor wijzigingen aan accounts: eerst de lock, dan opnieuw
+ * controleren of de uitvoerder (nog) een actieve eigenaar is. Zo kan een
+ * eigenaar die net is gedegradeerd niet alsnog een wijziging doorvoeren.
+ */
+async function ownerTransaction<T>(db: Database, actorId: string, fn: (tx: DbExecutor) => Promise<T>): Promise<T> {
+  return db.transaction(async (tx) => {
+    await lockOwners(tx)
+    const [actor] = await tx.select({ role: users.role, active: users.active }).from(users).where(eq(users.id, actorId))
+    if (!actor || !actor.active || actor.role !== 'eigenaar') throw new UserAdminError('Alleen een actieve eigenaar kan accounts beheren.')
+    return fn(tx)
+  })
+}
+
 export type UserListItem = Pick<User, 'id' | 'email' | 'name' | 'role' | 'active' | 'mustChangePassword' | 'lastLoginAt' | 'createdAt'>
 
 export async function listUsers(db: DbExecutor): Promise<UserListItem[]> {
@@ -64,14 +78,16 @@ export async function inviteUser(
   if (name.length < 2 || name.length > 80) throw new UserAdminError('Gebruik een naam van 2 tot 80 tekens.')
   const temporaryPassword = generateTemporaryPassword()
   try {
-    const { created, user } = await createUser(db, {
-      email: input.email,
-      name,
-      role: input.role,
-      password: temporaryPassword,
-      mustChangePassword: true,
-      actorId,
-    })
+    const { created, user } = await ownerTransaction(db, actorId, (tx) =>
+      createUser(tx, {
+        email: input.email,
+        name,
+        role: input.role,
+        password: temporaryPassword,
+        mustChangePassword: true,
+        actorId,
+      }),
+    )
     if (!created) throw new UserAdminError('Er bestaat al een account met dit e-mailadres.')
     return { user, temporaryPassword }
   } catch (err) {
@@ -84,8 +100,7 @@ export async function inviteUser(
 
 export async function changeRole(db: Database, userId: string, role: Role, actorId: string): Promise<void> {
   if (userId === actorId) throw new UserAdminError('Je kunt je eigen rol niet wijzigen. Laat dit door een andere eigenaar doen.')
-  await db.transaction(async (tx) => {
-    await lockOwners(tx)
+  await ownerTransaction(db, actorId, async (tx) => {
     const target = await lockedUser(tx, userId)
     if (target.role === role) return
     if (target.role === 'eigenaar' && target.active && (await activeOwnerCount(tx)) <= 1) {
@@ -105,8 +120,7 @@ export async function changeRole(db: Database, userId: string, role: Role, actor
 
 export async function setUserActive(db: Database, userId: string, active: boolean, actorId: string): Promise<void> {
   if (userId === actorId && !active) throw new UserAdminError('Je kunt je eigen account niet deactiveren.')
-  await db.transaction(async (tx) => {
-    await lockOwners(tx)
+  await ownerTransaction(db, actorId, async (tx) => {
     const target = await lockedUser(tx, userId)
     if (target.active === active) return
     if (!active && target.role === 'eigenaar' && (await activeOwnerCount(tx)) <= 1) {
@@ -130,7 +144,7 @@ export async function resetUserPassword(db: Database, userId: string, actorId: s
   if (userId === actorId) throw new UserAdminError('Wijzig je eigen wachtwoord via Mijn account.')
   const temporaryPassword = generateTemporaryPassword()
   const passwordHash = await hashPassword(temporaryPassword)
-  await db.transaction(async (tx) => {
+  await ownerTransaction(db, actorId, async (tx) => {
     const target = await lockedUser(tx, userId)
     await tx.update(users).set({ passwordHash, mustChangePassword: true, updatedAt: new Date() }).where(eq(users.id, userId))
     await tx.delete(sessions).where(eq(sessions.userId, userId))
@@ -148,7 +162,7 @@ export async function resetUserPassword(db: Database, userId: string, actorId: s
 export async function renameUser(db: Database, userId: string, name: string, actorId: string): Promise<void> {
   const clean = name.trim()
   if (clean.length < 2 || clean.length > 80) throw new UserAdminError('Gebruik een naam van 2 tot 80 tekens.')
-  await db.transaction(async (tx) => {
+  await ownerTransaction(db, actorId, async (tx) => {
     const target = await lockedUser(tx, userId)
     if (target.name === clean) return
     await tx.update(users).set({ name: clean, updatedAt: new Date() }).where(eq(users.id, userId))

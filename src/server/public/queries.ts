@@ -164,8 +164,12 @@ async function loadVehicles(where: VehicleSelector, ctx: PublicContext): Promise
   ])
 
   const live = ctx.mode === 'live'
-  return rows.map((r) => {
-    const confirmed = new Set(verificationRows.filter((v) => v.vehicleId === r.id).map((v) => v.field as VerificationField))
+  const preview = typeof where === 'object' && 'previewId' in where
+  const confirmedFor = (id: string) => new Set(verificationRows.filter((v) => v.vehicleId === id).map((v) => v.field as VerificationField))
+  // Op de live site alleen auto’s waarvan de fotorechten bevestigd zijn.
+  const visible = live && !preview ? rows.filter((r) => confirmedFor(r.id).has('fotos')) : rows
+  return visible.map((r) => {
+    const confirmed = confirmedFor(r.id)
     const photos = photoRows.filter((p) => p.vehicleId === r.id)
     const primary = photos.find((p) => p.id === r.primaryMediaId) ?? photos[0] ?? null
     const ordered = primary ? [primary, ...photos.filter((p) => p.id !== primary.id)] : photos

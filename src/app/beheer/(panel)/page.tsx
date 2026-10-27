@@ -4,12 +4,13 @@ import { PlanningBadge } from '@/components/admin/Badges'
 import { EmptyState, PageHeader } from '@/components/admin/PageHeader'
 import { Alert, Check, Info } from '@/components/icons'
 import { can } from '@/domain/permissions'
-import { formatDate, formatDateTimeShort, formatPeriod } from '@/domain/time'
+import { formatDateTimeShort, formatPeriod } from '@/domain/time'
 import { siteUrl } from '@/lib/site'
 import { dashboardData } from '@/server/admin/queries'
 import { requireUser } from '@/server/auth/session'
 import { getSetting } from '@/server/content/settings'
 import { mailConfigured } from '@/server/mail'
+import { VEHICLE_STATUS_LABELS } from './wagenpark/labels'
 
 export const metadata: Metadata = { title: 'Dashboard' }
 
@@ -180,7 +181,7 @@ export default async function DashboardPage() {
               <li key={v.id}>
                 <Link href={`/beheer/wagenpark/${v.id}`}>{v.name}</Link>
                 <span className="adm-small">
-                  {v.status} · {formatDateTimeShort(v.updatedAt)}
+                  {VEHICLE_STATUS_LABELS[v.status]} · {formatDateTimeShort(v.updatedAt)}
                 </span>
               </li>
             ))}
@@ -190,7 +191,7 @@ export default async function DashboardPage() {
         {seesContent || can(user.role, 'acties:beheren') ? (
           <section className="adm-panel" aria-labelledby="goedkeuring-titel">
             <h2 id="goedkeuring-titel" className="adm-section-title">
-              Wacht op goedkeuring
+              Wacht op de eigenaar
             </h2>
             <ul className="adm-list">
               <li>
@@ -205,12 +206,6 @@ export default async function DashboardPage() {
                 <li key={p.slug}>
                   <Link href={`/beheer/inhoud?tab=paginas`}>{p.title} (niet gepubliceerd)</Link>
                   <span className="adm-small">concept</span>
-                </li>
-              ))}
-              {data.activePromos.map((p) => (
-                <li key={p.id}>
-                  <span>Actie “{p.title}”</span>
-                  <span className="adm-small">loopt tot {formatDate(new Date(p.endsAt.getTime() - 1))}</span>
                 </li>
               ))}
             </ul>

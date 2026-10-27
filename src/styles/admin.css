@@ -909,6 +909,143 @@ a.adm-stat:hover {
   }
 }
 
+/* ───────────── Publicatiecheck ───────────── */
+
+.adm-publish {
+  border-left: 2px solid var(--c-champagne);
+}
+
+.adm-checklist {
+  list-style: none;
+  display: grid;
+}
+
+.adm-checklist > li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--s-3);
+  padding-block: 0.8rem;
+  border-bottom: 1px solid var(--c-line-soft);
+}
+
+.adm-checklist > li:last-child {
+  border-bottom: 0;
+}
+
+.adm-checklist__text {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.adm-checklist__action {
+  display: grid;
+  justify-items: end;
+  gap: var(--s-2);
+}
+
+.adm-check-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.05rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.adm-check-icon.is-ok {
+  color: var(--c-ok);
+}
+
+.adm-check-icon.is-open {
+  color: var(--c-danger);
+}
+
+.adm-check-icon.is-warn {
+  color: var(--c-warn);
+}
+
+@media (max-width: 559.98px) {
+  .adm-checklist > li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .adm-checklist__action {
+    grid-column: 2;
+    justify-items: start;
+  }
+}
+
+.adm-verify > li {
+  display: grid;
+  justify-content: stretch;
+  gap: var(--s-3);
+  padding-block: var(--s-4);
+}
+
+.adm-verify__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--s-2) var(--s-4);
+}
+
+.adm-verify .adm-chips {
+  list-style: none;
+}
+
+.adm-verify__label {
+  color: var(--c-bone-2);
+}
+
+.adm-legal-preview {
+  max-height: 24rem;
+  overflow: auto;
+  padding: var(--s-4);
+  border: 1px solid var(--c-line-soft);
+  border-radius: var(--r-xs);
+  background: var(--c-carbon);
+  white-space: pre-wrap;
+  font-size: 0.9375rem;
+  color: var(--c-bone-2);
+}
+
+.adm-rights-list {
+  list-style: none;
+  display: grid;
+  gap: var(--s-2);
+  font-size: 0.9375rem;
+}
+
+.adm-rights-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+}
+
+.adm-rights-list svg {
+  flex: none;
+  margin-top: 0.2rem;
+  color: var(--c-champagne);
+}
+
+/* Korte melding met icoon op één regel. */
+.adm-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  font-size: 0.875rem;
+  color: var(--c-bone-2);
+}
+
+.adm-note svg {
+  flex: none;
+  margin-top: 0.15rem;
+  color: var(--c-warn);
+}
+
 /* ───────────── Gebruikers ───────────── */
 
 .adm-users > li {

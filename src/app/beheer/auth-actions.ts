@@ -78,5 +78,7 @@ export async function changePassword(_prev: ActionState, formData: FormData): Pr
   await destroyAllSessions(user.id)
   await createSession(user.id)
   await recordAudit(db, { actorId: user.id, action: 'gebruiker.wachtwoord', entityType: 'gebruiker', entityId: user.id, summary: 'Eigen wachtwoord gewijzigd' })
+  // Na een verplichte wijziging verdwijnt het formulier; toon de bevestiging op de accountpagina.
+  if (user.mustChangePassword) redirect('/beheer/account?gewijzigd=1')
   return { ok: true, message: 'Je wachtwoord is gewijzigd. Andere sessies zijn afgemeld.' }
 }

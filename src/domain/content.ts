@@ -128,6 +128,35 @@ export const pricingRulesSchema = z.object({
   confirmed: z.boolean(),
 })
 
+/** Controles op bedrijfsniveau die de eigenaar vóór livegang afvinkt. */
+export const SITE_CHECKS = [
+  {
+    key: 'logo',
+    label: 'Logo',
+    hint: 'Het logo mag in deze vorm op de website staan. Een scherp vectorbestand (SVG of PDF) is aangevraagd of aangeleverd.',
+  },
+  {
+    key: 'contact',
+    label: 'Contactgegevens',
+    hint: 'WhatsApp, telefoonnummer en Instagram zijn van Goed Geregeld zelf en niet van een tussenpersoon.',
+  },
+  {
+    key: 'teksten',
+    label: 'Teksten',
+    hint: 'De teksten op de homepage en de autopagina’s zijn gelezen en kloppen.',
+  },
+] as const
+
+export type SiteCheckKey = (typeof SITE_CHECKS)[number]['key']
+
+const siteCheck = z.object({
+  confirmed: z.boolean(),
+  by: z.string().max(80).nullable(),
+  at: z.iso.datetime().nullable(),
+})
+
+export const siteChecksSchema = z.object({ logo: siteCheck, contact: siteCheck, teksten: siteCheck })
+
 export const SETTINGS = {
   hero: heroSchema,
   marquee: marqueeSchema,
@@ -141,6 +170,7 @@ export const SETTINGS = {
   footer: footerSchema,
   publication: publicationSchema,
   pricingRules: pricingRulesSchema,
+  siteChecks: siteChecksSchema,
 } as const
 
 export type SettingKey = keyof typeof SETTINGS
@@ -160,6 +190,7 @@ export const SETTING_LABELS: Record<SettingKey, string> = {
   footer: 'Footer',
   publication: 'Publicatie',
   pricingRules: 'Tariefregels',
+  siteChecks: 'Controles vóór livegang',
 }
 
 /** Standaardinhoud van het concept. Afbeeldingen worden door de seed gekoppeld. */
@@ -246,6 +277,11 @@ export const DEFAULT_CONTENT: SiteContent = {
   },
   publication: { mode: 'concept', indexable: false },
   pricingRules: { dayCounting: null, vat: 'onbekend', confirmed: false },
+  siteChecks: {
+    logo: { confirmed: false, by: null, at: null },
+    contact: { confirmed: false, by: null, at: null },
+    teksten: { confirmed: false, by: null, at: null },
+  },
 }
 
 /* ───────────── Vaste onderwerpen voor veelgestelde vragen ───────────── */

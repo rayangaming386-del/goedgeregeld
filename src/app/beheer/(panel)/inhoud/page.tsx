@@ -389,37 +389,49 @@ async function PagesTab({ canApprove }: { canApprove: boolean }) {
               ) : null}
             </span>
           </div>
-          <ActionForm action={savePageAction} className="adm-form" aria-label={p.title}>
-            <input type="hidden" name="slug" value={p.slug} />
-            <div className="field">
-              <label className="field__label" htmlFor={`pt-${p.slug}`}>
-                Titel
-              </label>
-              <input className="input" id={`pt-${p.slug}`} name="title" defaultValue={p.title} maxLength={80} />
-              <FieldError name="title" />
-            </div>
-            <div className="field">
-              <label className="field__label" htmlFor={`pb-${p.slug}`}>
-                Tekst
-              </label>
-              <textarea className="textarea" id={`pb-${p.slug}`} name="body" rows={14} defaultValue={p.body} />
-              <FieldError name="body" />
-            </div>
-            <FormMessage />
-            <div className="adm-form-actions">
-              <SubmitButton variant="secondary">Opslaan</SubmitButton>
-              {canApprove && p.status !== 'gepubliceerd' ? (
-                <SubmitButton name="intent" value="publiceren">
-                  Goedkeuren en publiceren
-                </SubmitButton>
-              ) : null}
-              {canApprove && p.status === 'gepubliceerd' ? (
-                <SubmitButton name="intent" value="depubliceren" variant="ghost">
-                  Offline halen
-                </SubmitButton>
-              ) : null}
-            </div>
-          </ActionForm>
+          {p.status === 'gepubliceerd' && !canApprove ? (
+            <>
+              <p className="adm-note">
+                <Info size={16} />
+                <span>Goedgekeurd door de eigenaar. Alleen de eigenaar kan deze tekst nog wijzigen.</span>
+              </p>
+              <div className="adm-legal-preview" tabIndex={0} role="region" aria-label={`Goedgekeurde tekst: ${p.title}`}>
+                {p.body}
+              </div>
+            </>
+          ) : (
+            <ActionForm action={savePageAction} className="adm-form" aria-label={p.title}>
+              <input type="hidden" name="slug" value={p.slug} />
+              <div className="field">
+                <label className="field__label" htmlFor={`pt-${p.slug}`}>
+                  Titel
+                </label>
+                <input className="input" id={`pt-${p.slug}`} name="title" defaultValue={p.title} maxLength={80} />
+                <FieldError name="title" />
+              </div>
+              <div className="field">
+                <label className="field__label" htmlFor={`pb-${p.slug}`}>
+                  Tekst
+                </label>
+                <textarea className="textarea" id={`pb-${p.slug}`} name="body" rows={14} defaultValue={p.body} />
+                <FieldError name="body" />
+              </div>
+              <FormMessage />
+              <div className="adm-form-actions">
+                <SubmitButton variant="secondary">{p.status === 'gepubliceerd' ? 'Wijziging opslaan en goedkeuren' : 'Opslaan'}</SubmitButton>
+                {canApprove && p.status !== 'gepubliceerd' ? (
+                  <SubmitButton name="intent" value="publiceren">
+                    Goedkeuren en publiceren
+                  </SubmitButton>
+                ) : null}
+                {canApprove && p.status === 'gepubliceerd' ? (
+                  <SubmitButton name="intent" value="depubliceren" variant="ghost">
+                    Offline halen
+                  </SubmitButton>
+                ) : null}
+              </div>
+            </ActionForm>
+          )}
         </section>
       ))}
     </div>

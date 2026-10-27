@@ -34,8 +34,11 @@ export function ConfirmSubmit({
         ref={triggerRef}
         type="button"
         className={`btn btn--sm btn--secondary ${variant === 'danger' ? 'adm-danger' : ''}`}
-        onClick={() => dialogRef.current?.showModal()}
-        disabled={pending}
+        onClick={() => {
+          if (!pending) dialogRef.current?.showModal()
+        }}
+        aria-disabled={pending || undefined}
+        data-pending={pending || undefined}
       >
         {label}
       </button>

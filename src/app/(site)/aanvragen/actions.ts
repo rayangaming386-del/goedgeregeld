@@ -1,14 +1,13 @@
 'use server'
 
-import { eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { after } from 'next/server'
 import { validateRequest, type FieldErrors, type RequestInput } from '@/domain/request-validation'
 import { formatPeriod } from '@/domain/time'
 import { absoluteUrl } from '@/lib/site'
 import { getDb } from '@/server/db/client'
-import { vehicles } from '@/server/db/schema'
 import { notifyNewRequest } from '@/server/mail'
+import { getPublishedVehicle } from '@/server/public/queries'
 import { hashKey, hitRateLimit } from '@/server/rate-limit'
 import { createWebsiteRequest } from '@/server/reservations/service'
 
@@ -53,11 +52,9 @@ export async function submitRequest(_prev: RequestState, formData: FormData): Pr
 
   try {
     const db = getDb()
-    const [vehicle] = await db
-      .select({ id: vehicles.id, name: vehicles.name, status: vehicles.status })
-      .from(vehicles)
-      .where(eq(vehicles.slug, result.value.vehicle))
-    if (!vehicle || vehicle.status !== 'gepubliceerd') {
+    // Zelfde zichtbaarheidsregels als de website (status en, live, fotorechten).
+    const vehicle = await getPublishedVehicle(result.value.vehicle)
+    if (!vehicle) {
       return { status: 'invalid', errors: { vehicle: 'Kies een auto uit het wagenpark.' }, message: 'Controleer de gemarkeerde velden.' }
     }
 
