@@ -75,7 +75,92 @@ hostingpartij gezet, en de site staat in conceptmodus (niet vindbaar).
 
 ## 3. Uitgevoerde tests en metingen
 
-_Wordt hieronder aangevuld met de uitkomsten van de laatste testrun._
+Alle cijfers hieronder komen uit runs die echt zijn uitgevoerd op 27 oktober
+2026, lokaal, tegen een productiebuild (`pnpm build && pnpm start`) met de
+seedgegevens. Er zijn geen metingen op een echte server of bij echte
+bezoekers gedaan.
+
+### Geautomatiseerde tests
+
+| Suite | Uitkomst | Wat er getest wordt |
+|---|---|---|
+| `pnpm typecheck` | geslaagd | TypeScript strict, inclusief gegenereerde routetypes |
+| `pnpm test` — unit (63) | 63/63 geslaagd | tijd en zomertijd (11), beschikbaarheid en statusovergangen (12), prijsberekening, weekend/week, acties (21), rechten per rol en validatie van aanvragen (14), IP-bepaling achter een proxy (3), lokale opslag en padbeveiliging (2) |
+| `pnpm test` — integratie (33), tegen een echte PostgreSQL-testdatabase | 33/33 geslaagd | reserveringen: dubbele aanvragen, overlap, aansluitende periodes, 6 gelijktijdige bevestigingen waarvan er precies één slaagt, de database-constraint, opties en verlopen, blokkades, statushistorie, interne notities niet publiek (15); gebruikersbeheer inclusief twee eigenaren die elkaar tegelijk degraderen, bevestigingen die vervallen na een wijziging, publiceren zonder foto geweigerd, live-regels (10); rechten in de Server Actions zelf per rol, met controle dat de database bij een weigering niet verandert (8) |
+| `pnpm test:e2e` — Playwright, Chromium, desktop 1440×900 en mobiel 390×844 | 38 geslaagd, 0 mislukt, 16 bewust niet uitgevoerd | zie `tests/e2e/README.md`; niet uitgevoerd: de beheertests op mobiel, de menutests op desktop en de breedtetest op mobiel (die stelt zelf de breedtes in) |
+| Toegankelijkheid — axe-core 4.11, WCAG 2.0/2.1/2.2 A en AA | 0 bevindingen | 6 publieke pagina’s (inclusief de 404) en 26 beheerpagina’s (inclusief de inlogpagina, een aanvraag en alle tabbladen van een auto), op desktop en mobiel |
+
+Controles op de tests zelf:
+
+- De axe-meting is gecontroleerd met opzettelijk ingevoegde fouten (afbeelding
+  zonder alt, knop zonder naam, te weinig contrast): alle drie gevonden.
+- De gelijktijdigheidstest voor eigenaren faalt als de lock wordt weggehaald;
+  de rechtentest faalt als de controle in `updatePricingAction` wordt
+  verzwakt. Beide zijn daarna teruggezet.
+
+### In de browser gecontroleerd
+
+- Screenshots per sectie (homepage, wagenpark, autopagina, aanvraagpagina) op
+  360, 390, 430, 768, 1024, 1280, 1440 en 1920 px. Gevonden en opgelost: de
+  kop van de aanvraagpagina brak midden in een woord en liep op desktop onder
+  het formulier; de galerij op de autopagina was smaller dan de kolom; de
+  knoppen op de autopagina braken over twee regels; telefoonnummers braken
+  midden in het nummer. Daarna nergens horizontale overloop (ook automatisch
+  getest op alle acht breedtes).
+- Accountflow: aanmaken met eenmalig tijdelijk wachtwoord, inloggen, verplicht
+  eigen wachtwoord kiezen, rechten van de rol, deactiveren (direct overal
+  uitgelogd), daarna inloggen geweigerd met een algemene melding.
+- Publicatiecheck: bevestigen en intrekken, rekenregels kunnen niet bevestigd
+  worden zonder keuzes, live zetten geblokkeerd zolang er open punten zijn.
+- Beweging: na doorscrollen zijn alle onthulde elementen zichtbaar (desktop en
+  mobiel); met verminderde beweging is alles direct zichtbaar; geen
+  consolefouten. Na opslaan in het beheer blijft de toetsenbordfocus op de knop.
+
+Tijdens het testen gevonden en opgelost: de IP-bepaling voor rate limiting was
+te omzeilen met een zelf meegestuurde `X-Forwarded-For`; `.gitignore` sloot
+een bronbestand uit (gecontroleerd met een verse clone); in het beheer startte
+elke pagina ongeveer 60 server-renders door prefetchen (nu 15–20 verzoeken in
+totaal); de focus verdween na opslaan; bij een verbroken verbinding ging het
+ingevulde aanvraagformulier verloren; een eigenaar die het wachtwoord kwijt is
+kon niet meer inloggen (nu `pnpm user:reset-password`).
+
+### Prestaties (Lighthouse 12.8.2, Chromium 153, lokaal)
+
+Per pagina en profiel drie runs; in de tabel de mediaan.
+
+- **Desktop**: Lighthouse-desktopprofiel.
+- **Mobiel, gesimuleerd**: het standaard mobiele profiel van Lighthouse (en
+  PageSpeed Insights): 4× tragere CPU en een gesimuleerde trage 4G-verbinding.
+- **Mobiel, toegepast**: hetzelfde profiel, maar met echt toegepaste
+  vertraging (DevTools-throttling) in plaats van simulatie.
+
+| Pagina | Profiel | Performance | FCP | LCP | TBT | CLS |
+|---|---|---:|---:|---:|---:|---:|
+| Homepage | desktop | 99 | 0,38 s | 0,82 s | 7 ms | 0 |
+| | mobiel, gesimuleerd | 92 | 1,37 s | 2,95 s | 123 ms | 0 |
+| | mobiel, toegepast | 91 | 1,14 s | 2,13 s | 332 ms | 0,003 |
+| Wagenpark | desktop | 100 | 0,33 s | 0,75 s | 3 ms | 0 |
+| | mobiel, gesimuleerd | 90 | 1,22 s | 3,56 s | 117 ms | 0 |
+| | mobiel, toegepast | 92 | 1,06 s | 2,39 s | 266 ms | 0 |
+| Audi RS3 Sportback | desktop | 99 | 0,38 s | 0,83 s | 3 ms | 0 |
+| | mobiel, gesimuleerd | 93 | 1,36 s | 3,05 s | 125 ms | 0 |
+| | mobiel, toegepast | 87 | 1,28 s | 2,52 s | 409 ms | 0 |
+| Aanvragen | desktop | 100 | 0,33 s | 0,51 s | 4 ms | 0 |
+| | mobiel, gesimuleerd | 94 | 1,21 s | 2,96 s | 87 ms | 0 |
+| | mobiel, toegepast | 95 | 1,09 s | 1,09 s | 260 ms | 0,001 |
+
+Toegankelijkheid en best practices: 100 op alle gemeten pagina’s en profielen.
+SEO: 66 op alle pagina’s, uitsluitend door de bewuste `noindex` in
+conceptmodus (de enige afgekeurde controle is “pagina mag geïndexeerd
+worden”).
+
+Beoordeling tegen de doelen: CLS blijft overal ruim onder 0,1. De LCP-doelwaarde
+van 2,5 s wordt gehaald op desktop en met toegepaste mobiele vertraging (op de
+autopagina met 2,52 s net niet), maar **niet** in de gesimuleerde mobiele
+meting (2,95–3,56 s). Het grootste beeld bovenaan wordt daar al met voorrang
+geladen; de rest is vooral de JavaScript van React/Next.js op een
+gesimuleerd traag toestel. INP is in een labmeting niet te meten; TBT is de
+benadering. Echte veldwaarden volgen pas na livegang.
 
 ## 4. Opleverlijst: te bevestigen of aan te leveren door de eigenaar
 

@@ -118,6 +118,9 @@ toont; hij zet de website niet op een domein of bij een hostingpartij.
   `__Host-`-cookie met `Secure`. Voor een lokale test van een productiebuild
   over http: `SESSION_COOKIE_SECURE=false`.
 - **APP_SECRET** (minimaal 32 tekens) is verplicht in productie.
+- **Achter een proxy**: de rate limiting gebruikt het IP-adres dat de proxy
+  achteraan in `X-Forwarded-For` zet. Staan er meerdere proxy’s achter elkaar
+  (bijvoorbeeld een CDN vóór nginx), zet dan `TRUSTED_PROXY_HOPS` op dat aantal.
 - **Foto’s**: met `MEDIA_STORAGE=local` op één server of VPS met een
   blijvende schijf (zet `MEDIA_LOCAL_DIR` buiten de deploymap en maak er
   back-ups van). Voor serverless hosting is S3-compatibele opslag nodig
