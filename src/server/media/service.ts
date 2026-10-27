@@ -22,7 +22,7 @@ async function writeFiles(id: string, buffer: Buffer) {
   }
 }
 
-async function removeFiles(row: Pick<Media, 'originalKey' | 'variants'>) {
+export async function removeFiles(row: Pick<Media, 'originalKey' | 'variants'>) {
   const storage = getStorage()
   await Promise.allSettled([storage.delete(row.originalKey), ...row.variants.map((v) => storage.delete(v.key))])
 }

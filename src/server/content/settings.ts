@@ -1,6 +1,6 @@
 import { eq, inArray } from 'drizzle-orm'
 import { DEFAULT_CONTENT, SETTINGS, type SettingKey, type SettingValue, type SiteContent } from '@/domain/content'
-import { recordAudit, recordRevision } from '../audit'
+import { diff, recordAudit, recordRevision } from '../audit'
 import { getDb } from '../db/client'
 import { siteSettings } from '../db/schema'
 import type { DbExecutor } from '../db/types'
@@ -49,7 +49,16 @@ export async function saveSetting<K extends SettingKey>(
   } else {
     await db.insert(siteSettings).values({ key, value: parsed, updatedBy: actorId })
   }
-  await recordAudit(db, { actorId, action: 'inhoud.bijgewerkt', entityType: 'instelling', entityId: key, summary })
+  const before = (existing?.value ?? {}) as Record<string, unknown>
+  const after = parsed as Record<string, unknown>
+  await recordAudit(db, {
+    actorId,
+    action: 'inhoud.bijgewerkt',
+    entityType: 'instelling',
+    entityId: key,
+    summary,
+    changes: diff(before, after, Object.keys(after)),
+  })
 }
 
 export async function ensureDefaultSettings(db: DbExecutor, keys: SettingKey[] = Object.keys(SETTINGS) as SettingKey[]) {

@@ -85,7 +85,9 @@ function paragraphs(text: string): string[] {
     .filter(Boolean)
 }
 
-async function loadVehicles(where: 'all' | { slug: string }, ctx: PublicContext): Promise<PublicVehicle[]> {
+type VehicleSelector = 'all' | { slug: string } | { previewId: string }
+
+async function loadVehicles(where: VehicleSelector, ctx: PublicContext): Promise<PublicVehicle[]> {
   const db = getDb()
   const rows = await db
     .select({
@@ -118,7 +120,9 @@ async function loadVehicles(where: 'all' | { slug: string }, ctx: PublicContext)
     .where(
       where === 'all'
         ? eq(vehicles.status, 'gepubliceerd')
-        : and(eq(vehicles.status, 'gepubliceerd'), eq(vehicles.slug, where.slug)),
+        : 'slug' in where
+          ? and(eq(vehicles.status, 'gepubliceerd'), eq(vehicles.slug, where.slug))
+          : eq(vehicles.id, where.previewId),
     )
     .orderBy(asc(vehicles.sortOrder), asc(vehicles.name))
   if (rows.length === 0) return []
@@ -229,6 +233,13 @@ export const getPublishedVehicle = cache(async (slug: string): Promise<PublicVeh
   const [v] = await loadVehicles({ slug }, ctx)
   return v ?? null
 })
+
+/** Alleen voor de voorvertoning in het beheer (ook concept en gearchiveerd). */
+export async function getVehicleForPreview(id: string): Promise<PublicVehicle | null> {
+  const ctx = await getPublicContext()
+  const [v] = await loadVehicles({ previewId: id }, ctx)
+  return v ?? null
+}
 
 export const getPublicImages = cache(async (ids: Array<string | null | undefined>): Promise<Map<string, PublicImage>> => {
   const wanted = ids.filter((id): id is string => Boolean(id))

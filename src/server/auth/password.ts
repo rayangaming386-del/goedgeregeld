@@ -1,3 +1,4 @@
+import { randomInt } from 'node:crypto'
 import { hash, verify } from '@node-rs/argon2'
 
 // Argon2id met de door OWASP aanbevolen minimuminstellingen (19 MiB, t=2, p=1).
@@ -35,9 +36,8 @@ export function passwordProblem(password: string, context: { email?: string; nam
 /** Een tijdelijk wachtwoord voor nieuwe accounts (wordt eenmalig getoond). */
 export function generateTemporaryPassword(): string {
   const alphabet = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  const bytes = crypto.getRandomValues(new Uint8Array(18))
   let out = ''
-  for (const b of bytes) out += alphabet[b % alphabet.length]
+  for (let i = 0; i < 18; i++) out += alphabet[randomInt(alphabet.length)]
   return `${out.slice(0, 6)}-${out.slice(6, 12)}-${out.slice(12, 18)}`
 }
 

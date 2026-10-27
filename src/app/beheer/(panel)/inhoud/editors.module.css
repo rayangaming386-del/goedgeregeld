@@ -1,0 +1,134 @@
+.media {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 9rem;
+  gap: var(--s-4);
+  align-items: start;
+}
+
+.preview {
+  width: 100%;
+  object-fit: cover;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-xs);
+  cursor: crosshair;
+}
+
+.previewEmpty {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  border: 1px dashed var(--c-line);
+  font-size: 0.75rem;
+  color: var(--c-bone-3);
+  text-align: center;
+}
+
+.hero {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.previews {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  align-items: start;
+}
+
+.previews figure {
+  display: grid;
+  gap: var(--s-2);
+  margin: 0;
+}
+
+/*
+ * Beide voorvertoningen rekenen in cqw zodat de regelval klopt, ongeacht hoe
+ * breed het vak in het beheer is. Waarden zijn afgeleid van Hero.module.css.
+ */
+.phoneWrap {
+  width: 100%;
+  max-width: 390px;
+  container-type: inline-size;
+}
+
+/* 390 px: rand 17,4 px, kop 45,8 px, intro 18 px, tussenruimte 24 px. */
+.phone {
+  padding: 8cqw 4.46cqw 6cqw;
+  background: var(--c-night);
+  border: 1px solid var(--c-line);
+}
+
+.phoneTitle,
+.deskTitle {
+  font-family: var(--font-sans);
+  font-stretch: 125%;
+  font-weight: 660;
+  letter-spacing: -0.025em;
+  line-height: 0.94;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.phoneTitle {
+  font-size: 11.73cqw;
+}
+
+.phoneTitle span,
+.deskTitle span {
+  color: var(--c-champagne);
+}
+
+.phoneIntro {
+  max-width: 36ch;
+  margin-top: 6.15cqw;
+  font-size: 4.62cqw;
+  line-height: 1.5;
+  color: var(--c-bone-2);
+}
+
+/* 1440 × 900: tekstkolom 705 px breed, kop 97 px, intro 22 px, foto 46 % rechts. */
+.deskWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1440 / 900;
+  overflow: hidden;
+  background: var(--c-night);
+  border: 1px solid var(--c-line);
+  container-type: inline-size;
+}
+
+.deskPhoto {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 46%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, var(--c-graphite), var(--c-carbon));
+  border-left: 1px solid var(--c-line-soft);
+  font-family: var(--font-mono);
+  font-size: max(0.625rem, 0.9cqw);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-bone-3);
+}
+
+.desk {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 51.8%;
+  display: grid;
+  align-content: center;
+  padding: 5.8cqw 0 4cqw 2.78cqw;
+}
+
+.deskTitle {
+  font-size: 6.73cqw;
+}
+
+.deskIntro {
+  max-width: 36ch;
+  margin-top: 2.22cqw;
+  font-size: 1.53cqw;
+  line-height: 1.5;
+  color: var(--c-bone-2);
+}

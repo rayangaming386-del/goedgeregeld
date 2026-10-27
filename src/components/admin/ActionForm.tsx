@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, startTransition, useActionState, useContext, useEffect, useRef } from 'react'
+import { createContext, startTransition, useActionState, useContext, useEffect, useRef, useState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { Alert, Check } from '@/components/icons'
 import { INITIAL_STATE, type ActionState } from './action-state'
@@ -76,6 +76,41 @@ export function FormMessage() {
       {state.ok ? <Check size={16} /> : <Alert size={16} />}
       <span>{state.message}</span>
     </p>
+  )
+}
+
+/** Toont een eenmalig gegeven (tijdelijk wachtwoord) met kopieerknop. */
+export function SecretNotice() {
+  const state = useContext(StateContext)
+  const [copied, setCopied] = useState(false)
+  useEffect(() => setCopied(false), [state.at])
+  if (!state.ok || !state.secret) return null
+  const { label, value } = state.secret
+  return (
+    <div className="adm-secret" role="status">
+      <p className="adm-small">{label}</p>
+      <div className="adm-secret__row">
+        <code className="adm-secret__value">{value}</code>
+        <button
+          type="button"
+          className="btn btn--secondary btn--sm"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(value)
+              setCopied(true)
+            } catch {
+              setCopied(false)
+            }
+          }}
+        >
+          {copied ? 'Gekopieerd' : 'Kopiëren'}
+        </button>
+      </div>
+      <p className="adm-small">
+        Dit wachtwoord wordt maar één keer getoond en nergens bewaard. Geef het persoonlijk of via een beveiligd kanaal door; bij de eerste
+        login moet een eigen wachtwoord worden gekozen.
+      </p>
+    </div>
   )
 }
 

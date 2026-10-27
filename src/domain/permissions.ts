@@ -40,6 +40,27 @@ export const PERMISSIONS = [
 
 export type Permission = (typeof PERMISSIONS)[number]
 
+/** Omschrijving per recht, voor het overzicht in Gebruikers. */
+export const PERMISSION_LABELS: Record<Permission, string> = {
+  'dashboard:bekijken': 'Dashboard en publicatiecheck bekijken',
+  'aanvragen:bekijken': 'Aanvragen en kalender bekijken',
+  'aanvragen:beheren': 'Aanvragen behandelen en status wijzigen',
+  'planning:beheren': 'Reserveringen, opties en blokkades beheren',
+  'wagenpark:bekijken': 'Wagenpark bekijken',
+  'wagenpark:bewerken': 'Auto’s, teksten en specificaties bewerken',
+  'wagenpark:publiceren': 'Auto’s publiceren en offline halen',
+  'wagenpark:archiveren': 'Auto’s archiveren en verwijderen',
+  'prijzen:beheren': 'Prijzen en borg wijzigen',
+  'brongegevens:bevestigen': 'Prijzen, specificaties en voorwaarden bevestigen',
+  'media:beheren': 'Foto’s uploaden en beheren',
+  'acties:beheren': 'Acties beheren',
+  'inhoud:beheren': 'Website-teksten en veelgestelde vragen bewerken',
+  'paginas:goedkeuren': 'Privacyverklaring en voorwaarden goedkeuren',
+  'instellingen:beheren': 'Contactgegevens, rekenregels en livegang beheren',
+  'gebruikers:beheren': 'Gebruikers en rollen beheren',
+  'geschiedenis:bekijken': 'Wijzigingsgeschiedenis bekijken',
+}
+
 const MATRIX: Record<Role, readonly Permission[]> = {
   eigenaar: PERMISSIONS,
   medewerker: [

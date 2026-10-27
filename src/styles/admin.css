@@ -543,6 +543,57 @@ a.adm-stat:hover {
   gap: var(--s-3);
 }
 
+/* Groep velden binnen een formulier, bijv. één hoofdstuk of één stap. */
+.adm-fieldset {
+  display: grid;
+  gap: var(--s-4);
+  min-width: 0;
+  margin: 0;
+  padding: var(--s-4) var(--s-4) var(--s-5);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-xs);
+  background: var(--c-carbon);
+}
+
+.adm-fieldset > legend {
+  padding: 0 var(--s-2);
+  font-weight: 600;
+  color: var(--c-bone);
+}
+
+@media (min-width: 900px) {
+  .adm-step {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+  }
+}
+
+/* Eenmalig getoond geheim (tijdelijk wachtwoord). */
+.adm-secret {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  border: 1px solid var(--c-champagne-deep);
+  border-radius: var(--r-xs);
+  background: rgb(200 179 126 / 0.07);
+}
+
+.adm-secret__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.adm-secret__value {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  letter-spacing: 0.04em;
+  color: var(--c-bone);
+  user-select: all;
+  overflow-wrap: anywhere;
+}
+
 .adm-counter {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -719,6 +770,58 @@ a.adm-stat:hover {
   background: var(--c-champagne);
 }
 
+/* Wijzigingsgeschiedenis */
+.adm-audit {
+  gap: var(--s-4);
+}
+
+.adm-audit > li {
+  gap: var(--s-1);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--c-line-soft);
+}
+
+.adm-audit__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--s-2) var(--s-4);
+}
+
+.adm-audit details > summary {
+  cursor: pointer;
+  width: fit-content;
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.adm-changes > div {
+  grid-template-columns: minmax(6rem, 10rem) minmax(0, 1fr);
+}
+
+.adm-changes dt {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.adm-changes dd {
+  overflow-wrap: anywhere;
+}
+
+.adm-changes__from {
+  color: var(--c-bone-3);
+  text-decoration: line-through;
+  text-decoration-color: rgb(238 234 226 / 0.3);
+}
+
+.adm-filters__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
 .adm-dl {
   display: grid;
   gap: 0;
@@ -778,6 +881,84 @@ a.adm-stat:hover {
   gap: var(--s-2);
 }
 
+/* Formulier op één regel: velden en knop naast elkaar, onder elkaar op smal scherm. */
+.adm-row-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-3);
+}
+
+.adm-row-form .field {
+  flex: 1 1 14rem;
+}
+
+.adm-row-form .adm-message {
+  flex-basis: 100%;
+}
+
+.adm-break {
+  overflow-wrap: anywhere;
+}
+
+/* Twee kolommen: hoofdinhoud en zijkolom. */
+@media (min-width: 1100px) {
+  .adm-grid--split {
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+/* ───────────── Gebruikers ───────────── */
+
+.adm-users > li {
+  display: grid;
+  justify-content: stretch;
+  gap: var(--s-2);
+}
+
+.adm-users__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--s-2) var(--s-4);
+}
+
+.adm-users__manage[open] > summary {
+  margin-bottom: var(--s-3);
+}
+
+.adm-dl--stacked > div {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-1);
+}
+
+.adm-dl--stacked dt {
+  font-weight: 600;
+  color: var(--c-bone);
+}
+
+.adm-dl--stacked dd {
+  color: var(--c-bone-2);
+}
+
+.adm-rights th[scope='row'] {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+  color: var(--c-bone-2);
+  background: none;
+}
+
+.adm-rights td {
+  text-align: center;
+  color: var(--c-champagne);
+}
+
 /* ───────────── Login ───────────── */
 
 .adm-login {
@@ -798,4 +979,116 @@ a.adm-stat:hover {
   background: var(--c-graphite);
   border: 1px solid var(--c-line-soft);
   border-radius: var(--r-xs);
+}
+
+/* ───────────── Foto’s ───────────── */
+
+.adm-upload-list {
+  list-style: none;
+  display: grid;
+  gap: var(--s-2);
+}
+
+.adm-upload-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+
+.adm-upload-list img {
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: cover;
+  border-radius: var(--r-xs);
+}
+
+.adm-upload-name {
+  flex: 1;
+  min-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm-photos {
+  list-style: none;
+  display: grid;
+  gap: var(--s-4);
+}
+
+.adm-photo {
+  background: var(--c-graphite);
+  border: 1px solid var(--c-line-soft);
+  border-radius: var(--r-xs);
+  padding: var(--s-4);
+}
+
+.adm-photo[draggable='true'] {
+  cursor: grab;
+}
+
+.adm-photo.is-dragging {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.adm-photo__inner {
+  display: grid;
+  gap: var(--s-5);
+}
+
+@media (min-width: 900px) {
+  .adm-photo__inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+
+.adm-photo__media {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1.2fr);
+  gap: var(--s-3);
+  align-items: start;
+}
+
+.adm-photo__meta {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+  min-width: 0;
+}
+
+.adm-focal {
+  position: relative;
+  line-height: 0;
+}
+
+.adm-focal img {
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+  border-radius: var(--r-xs);
+}
+
+.adm-focal__marker {
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: -0.75rem 0 0 -0.75rem;
+  border: 2px solid var(--c-champagne);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.6);
+  pointer-events: none;
+}
+
+.adm-crops {
+  display: grid;
+  gap: var(--s-2);
+}
+
+.adm-crops img {
+  width: 100%;
+  object-fit: cover;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--c-line);
 }

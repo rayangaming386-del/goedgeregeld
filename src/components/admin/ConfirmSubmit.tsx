@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useId, useRef } from 'react'
 import { useFormStatus } from 'react-dom'
 
 /**
@@ -26,6 +26,7 @@ export function ConfirmSubmit({
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const titleId = useId()
   const { pending } = useFormStatus()
   return (
     <>
@@ -38,8 +39,8 @@ export function ConfirmSubmit({
       >
         {label}
       </button>
-      <dialog ref={dialogRef} className="adm-dialog" aria-labelledby={`${name ?? 'bevestig'}-${value ?? ''}-titel`}>
-        <h2 id={`${name ?? 'bevestig'}-${value ?? ''}-titel`} className="adm-dialog__title">
+      <dialog ref={dialogRef} className="adm-dialog" aria-labelledby={titleId}>
+        <h2 id={titleId} className="adm-dialog__title">
           {title}
         </h2>
         <p className="adm-dialog__text">{description}</p>

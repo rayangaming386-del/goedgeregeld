@@ -1,0 +1,34 @@
+/* Voorvertoning in het beheer: zelfde opmaak als de website, met een duidelijke balk. */
+.preview-frame {
+  --header-h: 3.5rem;
+  margin: calc(var(--s-5) * -1) calc(var(--gutter) * -1) 0;
+}
+
+@media (min-width: 1080px) {
+  .preview-frame {
+    margin: calc(var(--s-7) * -1) calc(clamp(1.5rem, 1rem + 2vw, 3rem) * -1) 0;
+  }
+}
+
+.preview-banner {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-5);
+  min-height: var(--header-h);
+  padding: var(--s-2) var(--gutter);
+  background: var(--c-champagne);
+  color: var(--c-on-accent);
+  font-size: 0.875rem;
+  font-weight: 560;
+}
+
+.preview-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: inherit;
+}
